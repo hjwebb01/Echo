@@ -4,6 +4,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
+    // Raycasting vars
+    let raycasting = {
+        active: false,
+        rays: [],
+        maxDistance: 100,  // Same as the SonarEcho maxRadius
+        visibility: false
+    };
+
     // Player movement handling
     let movement = { up: false, down: false, left: false, right: false };
     const moveSpeed = 2;
@@ -49,6 +57,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     SonarEcho.active = true;
                     SonarEcho.radius = 0;
                 }
+                break;
+            case 'r':
+                raycasting.visibility = !raycasting.visibility;
                 break;
         }
     });
@@ -99,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     
             // Smaller inner rectangle for border effect
-            const borderSize = 4;
+            const borderSize = 2;
             ctx.fillStyle = '#000';
             ctx.fillRect(wall.x + borderSize, wall.y + borderSize, wall.width - 2 * borderSize, wall.height - 2 * borderSize);
     
@@ -138,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
             width: player.width,
             height: player.height
         };
-    
+
         return walls.some(wall => {
             return (playerRect.x < wall.x + wall.width &&
                     playerRect.x + playerRect.width > wall.x &&
@@ -146,10 +157,50 @@ document.addEventListener("DOMContentLoaded", function() {
                     playerRect.y + playerRect.height > wall.y);
         });
     }
+
+    function rayHitsWall(rayX, rayY) {
+        return walls.some(wall => {
+            return (rayX >= wall.x && rayX <= wall.x + wall.width &&
+                    rayY >= wall.y && rayY <= wall.y + wall.height);
+        });
+    }
+    
     
     // RAYCASTING RAAAAAAAAAAAAAAAAAAHHH
-    function castRay(angle, maxDistance) {
-        // ok this is kinda hard
+    function castRays() {
+        raycasting.rays = []; // Clear previous rays
+        const angleIncrement = Math.PI * 2 / 360; // Cast 360 rays around the player
+        const playerCenterX = player.x + player.width / 2;
+        const playerCenterY = player.y + player.height / 2;
+    
+        for (let angle = 0; angle < Math.PI * 2; angle += angleIncrement) {
+            for (let distance = 0; distance < raycasting.maxDistance; distance++) {
+                const rayX = Math.round(playerCenterX + distance * Math.cos(angle));
+                const rayY = Math.round(playerCenterY + distance * Math.sin(angle));
+    
+                if (rayHitsWall(rayX, rayY)) {
+                    raycasting.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
+                    break; // Stop this ray if it hits a wall
+                }
+    
+                if (distance === raycasting.maxDistance - 1) { // Ray reached maximum distance without hitting a wall
+                    raycasting.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
+                }
+            }
+        }
+    }
+    
+    
+    function drawRays() {
+        if (raycasting.visibility) {
+            ctx.strokeStyle = 'red';
+            ctx.beginPath();
+            raycasting.rays.forEach(ray => {
+                ctx.moveTo(player.x + player.width / 2, player.y + player.height / 2);
+                ctx.lineTo(ray.x, ray.y);
+            });
+            ctx.stroke();
+        }
     }
     
 
@@ -170,10 +221,15 @@ document.addEventListener("DOMContentLoaded", function() {
     function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         movePlayer();
+        
         drawWalls();
         drawPlayer();
+
         drawSonarEcho();
         requestAnimationFrame(gameLoop);
+
+        castRays();
+        drawRays();  // Draw rays
     }
 
     gameLoop(); // Game loop
