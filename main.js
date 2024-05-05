@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    canvas.style.backgroundColor = '#000'; // Background color
 
     // Raycasting vars
     let raycasting = {
@@ -15,8 +16,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Player movement handling
     let movement = { up: false, down: false, left: false, right: false };
     const moveSpeed = 2;
-
-    canvas.style.backgroundColor = '#000'; // Background color
 
     // Walls
     const walls = [
@@ -38,6 +37,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let echoes = [];
 
     // SonarEcho and movement listener
+    let canPing = true;
+   
     window.addEventListener('keydown', function(event) {
         switch (event.key) {
             case "ArrowUp":
@@ -53,9 +54,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 movement.right = true;
                 break;
             case 'e':
-                if (!SonarEcho.active) {
+                if (canPing && !SonarEcho.active) {
                     SonarEcho.active = true;
                     SonarEcho.radius = 0;
+                    canPing = false;
+                    setTimeout(function() {
+                        canPing = true;  // Re-enable pinging after 5 seconds (This is a workaround for now but may be scrapped in the future)
+                    }, 5000);
                 }
                 break;
             case 'r':
@@ -82,8 +87,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function drawWalls() {
-        ctx.fillStyle = '#000'; // Fill for outer wall
-        walls.forEach(wall => {
+        ctx.fillStyle = '#000'; // Fill outer wall
+        walls.forEach((wall, wallIndex) => {
             // Draw the base wall
             ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
     
@@ -105,19 +110,42 @@ document.addEventListener("DOMContentLoaded", function() {
                     ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
                     ctx.restore();
                 } else {
-                    echoes.splice(index, 1); // Remove echo after 5 seconds
+                    echoes.splice(index, 1); // Remove echo after 5 seconds (TODO: make multiple echos be usable at once)
                 }
             });
     
-            // Smaller inner rectangle for border effect
-            const borderSize = 2;
-            ctx.fillStyle = '#000';
-            ctx.fillRect(wall.x + borderSize, wall.y + borderSize, wall.width - 2 * borderSize, wall.height - 2 * borderSize);
+            // Use the stored visible sides at the time of the ping
+            let visibleSides = walls[wallIndex] && echoes[0] ? echoes[0].wallVisibility.find(wv => wv.wallId === wallIndex).visibleSides : getVisibleWallSides(wall);
     
+            const borderSize = 4;
+            let innerX = wall.x + borderSize;
+            let innerY = wall.y + borderSize;
+            let innerWidth = wall.width - 2 * borderSize;
+            let innerHeight = wall.height - 2 * borderSize;
+    
+            if (!visibleSides.includes('T')) {
+                innerY -= borderSize;
+                innerHeight += borderSize;
+            }
+            if (!visibleSides.includes('B')) {
+                innerHeight += borderSize;
+            }
+            if (!visibleSides.includes('L')) {
+                innerX -= borderSize;
+                innerWidth += borderSize;
+            }
+            if (!visibleSides.includes('R')) {
+                innerWidth += borderSize;
+            }
+    
+            ctx.fillStyle = '#000';
+            ctx.fillRect(innerX, innerY, innerWidth, innerHeight);
             ctx.strokeStyle = '#000';
             ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
         });
     }
+    
+
 
     function drawPlayer() {
         ctx.fillStyle = '#FFF';
@@ -165,6 +193,33 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     
+    function getVisibleWallSides(wall) {
+        const playerCenterX = player.x + player.width / 2;
+        const playerCenterY = player.y + player.height / 2;
+        let visibleSides = '';
+    
+        // Check top side visibility
+        if (playerCenterY > wall.y + wall.height) {
+            visibleSides += 'B';
+        }
+    
+        // Check bottom side visibility
+        if (playerCenterY < wall.y) {
+            visibleSides += 'T';
+        }
+    
+        // Check left side visibility
+        if (playerCenterX > wall.x + wall.width) {
+            visibleSides += 'R';
+        }
+    
+        // Check right side visibility
+        if (playerCenterX < wall.x) {
+            visibleSides += 'L'; 
+        }
+    
+        return visibleSides;
+    }   
     
     // RAYCASTING RAAAAAAAAAAAAAAAAAAHHH
     function castRays() {
@@ -190,7 +245,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
-    
     function drawRays() {
         if (raycasting.visibility) {
             ctx.strokeStyle = 'red';
@@ -202,7 +256,6 @@ document.addEventListener("DOMContentLoaded", function() {
             ctx.stroke();
         }
     }
-    
 
     function drawSonarEcho() {
         if (SonarEcho.active) {
@@ -213,7 +266,17 @@ document.addEventListener("DOMContentLoaded", function() {
             SonarEcho.radius += 4; // Expanding effect
             if (SonarEcho.radius > SonarEcho.maxRadius) {
                 SonarEcho.active = false; // Deactivate when hits max
-                echoes.push({x: player.x + player.width / 2, y: player.y + player.height / 2, radius: SonarEcho.radius, timestamp: Date.now()});
+                let wallVisibility = walls.map(wall => ({ 
+                    wallId: walls.indexOf(wall), 
+                    visibleSides: getVisibleWallSides(wall)
+                }));
+                echoes.push({
+                    x: player.x + player.width / 2, 
+                    y: player.y + player.height / 2, 
+                    radius: SonarEcho.radius, 
+                    timestamp: Date.now(), 
+                    wallVisibility: wallVisibility
+                });
             }
         }
     }
@@ -229,8 +292,8 @@ document.addEventListener("DOMContentLoaded", function() {
         requestAnimationFrame(gameLoop);
 
         castRays();
-        drawRays();  // Draw rays
+        drawRays(); 
     }
 
-    gameLoop(); // Game loop
+    gameLoop();
 });
