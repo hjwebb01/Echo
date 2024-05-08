@@ -15,8 +15,10 @@ document.addEventListener("DOMContentLoaded", function() {
     let raycasting = {
         active: false,
         rays: [],
-        maxDistance: 100,  // Same as the SonarEcho maxRadius
-        visibility: false
+        maxDistance: 500,  // Same as the SonarEcho maxRadius
+        visibility: false,
+        currentAngle: 0, // Spin stuff
+        spinSpeed: Math.PI / 180 
     };
 
     // Player movement handling
@@ -75,6 +77,10 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'r':
                 raycasting.visibility = !raycasting.visibility;
                 break;
+            case 's':
+                raycasting.spinning = !raycasting.spinning; // Toggle spinning on or off
+                break;
+                
         }
     });
 
@@ -231,11 +237,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // RAYCASTING RAAAAAAAAAAAAAAAAAAHHH
     function castRays() {
         raycasting.rays = []; // Clear previous rays
-        const angleIncrement = Math.PI * 2 / 36; // Cast 360 rays around the player
+        const angleIncrement = Math.PI * 2 / 18; // Cast 10 rays around the player for simplicity
         const playerCenterX = player.x + player.width / 2;
         const playerCenterY = player.y + player.height / 2;
     
-        for (let angle = 0; angle < Math.PI * 2; angle += angleIncrement) {
+        let startAngle = raycasting.currentAngle;
+        let endAngle = startAngle + Math.PI * 2;
+    
+        for (let angle = startAngle; angle < endAngle; angle += angleIncrement) {
             for (let distance = 0; distance < raycasting.maxDistance; distance++) {
                 const rayX = Math.round(playerCenterX + distance * Math.cos(angle));
                 const rayY = Math.round(playerCenterY + distance * Math.sin(angle));
@@ -250,7 +259,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         }
+    
+        // Spin stuff
+        if (raycasting.spinning) {
+            raycasting.currentAngle += raycasting.spinSpeed;
+            if (raycasting.currentAngle >= Math.PI * 2) {
+                raycasting.currentAngle -= Math.PI * 2; // Normalize angle
+            }
+        }
     }
+    
     
     function drawRays() {
         if (raycasting.visibility) {
