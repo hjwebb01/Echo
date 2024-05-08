@@ -5,6 +5,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const ctx = canvas.getContext('2d');
     canvas.style.backgroundColor = '#000'; // Background color
 
+    // Sounds (More to come)
+    var soundBell = new Audio('Bell.mp3')
+    function playBell() {
+        soundBell.play();
+    }
+
     // Raycasting vars
     let raycasting = {
         active: false,
@@ -20,7 +26,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Walls
     const walls = [
         { x: 500, y: 100, width: 100, height: 300 },
-        { x: 700, y: 360, width: 150, height: 150 }
+        { x: 700, y: 360, width: 150, height: 150 },
+        { x: 300, y: 500, width: 330, height: 80 },
+        { x: 700, y: 180, width: 300, height: 100}
     ];
 
     // Player
@@ -58,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     SonarEcho.active = true;
                     SonarEcho.radius = 0;
                     canPing = false;
+                    playBell();
                     setTimeout(function() {
                         canPing = true;  // Re-enable pinging after 5 seconds (This is a workaround for now but may be scrapped in the future)
                     }, 5000);
@@ -144,8 +153,6 @@ document.addEventListener("DOMContentLoaded", function() {
             ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
         });
     }
-    
-
 
     function drawPlayer() {
         ctx.fillStyle = '#FFF';
@@ -224,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // RAYCASTING RAAAAAAAAAAAAAAAAAAHHH
     function castRays() {
         raycasting.rays = []; // Clear previous rays
-        const angleIncrement = Math.PI * 2 / 360; // Cast 360 rays around the player
+        const angleIncrement = Math.PI * 2 / 36; // Cast 360 rays around the player
         const playerCenterX = player.x + player.width / 2;
         const playerCenterY = player.y + player.height / 2;
     
