@@ -1,4 +1,5 @@
-// Now we go
+// When launching the .html file, use it via VSCode's Live Server extension
+import { Player } from './Player.js';
 
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
@@ -21,9 +22,8 @@ document.addEventListener("DOMContentLoaded", function() {
         spinSpeed: Math.PI / 180 
     };
 
-    // Player movement handling
-    let movement = { up: false, down: false, left: false, right: false };
-    const moveSpeed = 2;
+    // Player
+    const player = new Player(650, 380, 10, 10, 2, canvas);
 
     // Walls
     const walls = [
@@ -32,9 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
         { x: 300, y: 500, width: 330, height: 80 },
         { x: 700, y: 180, width: 300, height: 100}
     ];
-
-    // Player
-    const player = { x: 650, y: 380, width: 10, height: 10 };
 
     // SonarEcho
     let SonarEcho = {
@@ -46,23 +43,16 @@ document.addEventListener("DOMContentLoaded", function() {
     // Keep track of lit up walls
     let echoes = [];
 
-    // SonarEcho and movement listener
+    // SonarEcho
     let canPing = true;
-   
+
+    // Event listeners for keyups and keydowns (smoother movement)
     window.addEventListener('keydown', function(event) {
         switch (event.key) {
-            case "ArrowUp":
-                movement.up = true;
-                break;
-            case "ArrowDown":
-                movement.down = true;
-                break;
-            case "ArrowLeft":
-                movement.left = true;
-                break;
-            case "ArrowRight":
-                movement.right = true;
-                break;
+            case "ArrowUp":    player.activeDirections.up = true; break;
+            case "ArrowDown":  player.activeDirections.down = true; break;
+            case "ArrowLeft":  player.activeDirections.left = true; break;
+            case "ArrowRight": player.activeDirections.right = true; break;
             case 'e':
                 if (canPing && !SonarEcho.active) {
                     SonarEcho.active = true;
@@ -86,18 +76,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     window.addEventListener('keyup', function(event) {
         switch (event.key) {
-            case "ArrowUp":
-                movement.up = false;
-                break;
-            case "ArrowDown":
-                movement.down = false;
-                break;
-            case "ArrowLeft":
-                movement.left = false;
-                break;
-            case "ArrowRight":
-                movement.right = false;
-                break;
+            case "ArrowUp":    player.activeDirections.up = false; break;
+            case "ArrowDown":  player.activeDirections.down = false; break;
+            case "ArrowLeft":  player.activeDirections.left = false; break;
+            case "ArrowRight": player.activeDirections.right = false; break;
         }
     });
 
@@ -157,45 +139,6 @@ document.addEventListener("DOMContentLoaded", function() {
             ctx.fillRect(innerX, innerY, innerWidth, innerHeight);
             ctx.strokeStyle = '#000';
             ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
-        });
-    }
-
-    function drawPlayer() {
-        ctx.fillStyle = '#FFF';
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-    }
-
-    function movePlayer() {
-        let newX = player.x;
-        let newY = player.y;
-    
-        if (movement.up) newY -= moveSpeed;
-        if (movement.down) newY += moveSpeed;
-        if (movement.left) newX -= moveSpeed;
-        if (movement.right) newX += moveSpeed;
-    
-        if (!checkCollision(newX, newY)) {
-            player.x = newX;
-            player.y = newY;
-        }
-    
-        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
-    }
-    
-    function checkCollision(newX, newY) {
-        const playerRect = {
-            x: newX,
-            y: newY,
-            width: player.width,
-            height: player.height
-        };
-
-        return walls.some(wall => {
-            return (playerRect.x < wall.x + wall.width &&
-                    playerRect.x + playerRect.width > wall.x &&
-                    playerRect.y < wall.y + wall.height &&
-                    playerRect.y + playerRect.height > wall.y);
         });
     }
 
@@ -308,10 +251,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        movePlayer();
         
+        player.update(walls);
         drawWalls();
-        drawPlayer();
+        player.draw(ctx);
 
         drawSonarEcho();
         requestAnimationFrame(gameLoop);
