@@ -1,5 +1,6 @@
 // When launching the .html file, use it via VSCode's Live Server extension
 import { Player } from './Player.js';
+import { Raycast } from './Raycast.js';
 
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
@@ -12,16 +13,6 @@ document.addEventListener("DOMContentLoaded", function() {
         soundBell.play();
     }
 
-    // Raycasting vars
-    let raycasting = {
-        active: false,
-        rays: [],
-        maxDistance: 500,  // Same as the SonarEcho maxRadius
-        visibility: false,
-        currentAngle: 0, // Spin stuff
-        spinSpeed: Math.PI / 180 
-    };
-
     // Player
     const player = new Player(650, 380, 10, 10, 2, canvas);
 
@@ -32,6 +23,9 @@ document.addEventListener("DOMContentLoaded", function() {
         { x: 300, y: 500, width: 330, height: 80 },
         { x: 700, y: 180, width: 300, height: 100}
     ];
+
+    // Raycaster
+    const raycast = new Raycast(canvas, player, walls);
 
     // SonarEcho
     let SonarEcho = {
@@ -65,12 +59,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 break;
             case 'r':
-                raycasting.visibility = !raycasting.visibility;
+                raycast.visibility = !raycast.visibility;
                 break;
             case 's':
-                raycasting.spinning = !raycasting.spinning; // Toggle spinning on or off
+                raycast.spinning = !raycast.spinning; // Toggle spinning on or off
                 break;
-                
+            case 'b':
+                raycast.bouncing = !raycast.bouncing; // Toggle spinning on or off
+                break;    
         }
     });
 
@@ -141,13 +137,6 @@ document.addEventListener("DOMContentLoaded", function() {
             ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
         });
     }
-
-    function rayHitsWall(rayX, rayY) {
-        return walls.some(wall => {
-            return (rayX >= wall.x && rayX <= wall.x + wall.width &&
-                    rayY >= wall.y && rayY <= wall.y + wall.height);
-        });
-    }
     
     function getVisibleWallSides(wall) {
         const playerCenterX = player.x + player.width / 2;
@@ -176,54 +165,6 @@ document.addEventListener("DOMContentLoaded", function() {
     
         return visibleSides;
     }   
-    
-    // RAYCASTING RAAAAAAAAAAAAAAAAAAHHH
-    function castRays() {
-        raycasting.rays = []; // Clear previous rays
-        const angleIncrement = Math.PI * 2 / 18; // Cast 10 rays around the player for simplicity
-        const playerCenterX = player.x + player.width / 2;
-        const playerCenterY = player.y + player.height / 2;
-    
-        let startAngle = raycasting.currentAngle;
-        let endAngle = startAngle + Math.PI * 2;
-    
-        for (let angle = startAngle; angle < endAngle; angle += angleIncrement) {
-            for (let distance = 0; distance < raycasting.maxDistance; distance++) {
-                const rayX = Math.round(playerCenterX + distance * Math.cos(angle));
-                const rayY = Math.round(playerCenterY + distance * Math.sin(angle));
-    
-                if (rayHitsWall(rayX, rayY)) {
-                    raycasting.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
-                    break; // Stop this ray if it hits a wall
-                }
-    
-                if (distance === raycasting.maxDistance - 1) { // Ray reached maximum distance without hitting a wall
-                    raycasting.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
-                }
-            }
-        }
-    
-        // Spin stuff
-        if (raycasting.spinning) {
-            raycasting.currentAngle += raycasting.spinSpeed;
-            if (raycasting.currentAngle >= Math.PI * 2) {
-                raycasting.currentAngle -= Math.PI * 2; // Normalize angle
-            }
-        }
-    }
-    
-    
-    function drawRays() {
-        if (raycasting.visibility) {
-            ctx.strokeStyle = 'red';
-            ctx.beginPath();
-            raycasting.rays.forEach(ray => {
-                ctx.moveTo(player.x + player.width / 2, player.y + player.height / 2);
-                ctx.lineTo(ray.x, ray.y);
-            });
-            ctx.stroke();
-        }
-    }
 
     function drawSonarEcho() {
         if (SonarEcho.active) {
@@ -259,8 +200,8 @@ document.addEventListener("DOMContentLoaded", function() {
         drawSonarEcho();
         requestAnimationFrame(gameLoop);
 
-        castRays();
-        drawRays(); 
+        raycast.castRays();
+        raycast.drawRays(ctx);
     }
 
     gameLoop();
