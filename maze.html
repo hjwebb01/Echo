@@ -51,6 +51,50 @@
         color: 'rgba(255, 0, 0, 0.2)',
         active: false
     };
+
+    function drawPlayer() {
+
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function drawMaze() {
+
+        maze.forEach(wall => {
+            if (radar.active && isWallInRadar(wall)) {
+                ctx.fillStyle = 'black';
+            } else {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+            }
+            ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+        });
+    }
+
+
+    function isWallInRadar(wall) {
+
+        const distance = Math.sqrt(Math.pow(radar.x - (wall.x + wall.width / 2), 2) + Math.pow(radar.y - (wall.y + wall.height / 2), 2));
+        return distance <= radar.radius;
+    }
+
+    function drawRadar() {
+
+        if (radar.active) {
+            ctx.beginPath();
+            ctx.arc(radar.x, radar.y, radar.radius, 0, Math.PI * 2);
+            ctx.fillStyle = radar.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+
+    function draw() {
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawMaze();
+        drawPlayer();
+        drawRadar();
+    }
 </script>
 </body>
 </html>
