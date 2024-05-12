@@ -7,6 +7,53 @@ document.addEventListener("DOMContentLoaded", function() {
     const ctx = canvas.getContext('2d');
     canvas.style.backgroundColor = '#000'; // Background color
 
+    // Sliders
+    const rayAmountSlider = document.getElementById('rayAmountSlider');
+    const maxDistanceSlider = document.getElementById('maxDistanceSlider');
+    const spinSpeedSlider = document.getElementById('spinSpeedSlider');
+
+    function updateRaycastSettings() {
+        raycast.rayAmount = parseInt(rayAmountSlider.value);
+        raycast.maxDistance = parseInt(maxDistanceSlider.value);
+        raycast.spinSpeedvar = parseInt(spinSpeedSlider.value);
+        raycast.spinSpeed = Math.PI / raycast.spinSpeedvar;
+    }
+
+    rayAmountSlider.addEventListener('input', updateRaycastSettings);
+    maxDistanceSlider.addEventListener('input', updateRaycastSettings);
+    spinSpeedSlider.addEventListener('input', updateRaycastSettings);
+
+    // Buttons
+    const toggleEcho = document.getElementById('toggleEcho');
+    const toggleVisibility = document.getElementById('toggleVisibility');
+    const toggleSpinning = document.getElementById('toggleSpinning');
+    const toggleCone = document.getElementById('toggleCone');
+
+    toggleEcho.addEventListener('click', () => {
+        if (canPing && !SonarEcho.active) {
+            SonarEcho.active = true;
+            SonarEcho.radius = 0;
+            canPing = false;
+            playBell();
+            setTimeout(function() {
+                canPing = true;  // Re-enable pinging after 5 seconds (This is a workaround for now but may be scrapped in the future)
+            }, 5000);
+        }
+    });
+
+
+    toggleVisibility.addEventListener('click', () => {
+        raycast.visibility = !raycast.visibility;
+    });
+
+    toggleSpinning.addEventListener('click', () => {
+        raycast.spinning = !raycast.spinning;
+    });
+
+    toggleCone.addEventListener('click', () => {
+        raycast.cone = !raycast.cone;
+    });
+
     // Sounds (More to come)
     var soundBell = new Audio('Bell.mp3')
     function playBell() {
@@ -64,8 +111,8 @@ document.addEventListener("DOMContentLoaded", function() {
             case 's':
                 raycast.spinning = !raycast.spinning; // Toggle spinning on or off
                 break;
-            case 'b':
-                raycast.bouncing = !raycast.bouncing; // Toggle spinning on or off
+            case 'c':
+                raycast.cone = !raycast.cone; // Toggle cone shape on or off
                 break;    
         }
     });
@@ -202,6 +249,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         raycast.castRays();
         raycast.drawRays(ctx);
+
+        updateRaycastSettings();
     }
 
     gameLoop();

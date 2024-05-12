@@ -4,22 +4,30 @@ export class Raycast {
         this.player = player;
         this.walls = walls;
         this.rays = [];
-        this.maxDistance = 300;
+        this.rayAmount = 90; // 1 to 360
+        this.maxDistance = 100; // 10 to 500
         this.visibility = false;
         this.currentAngle = 0;
-        this.spinSpeed = Math.PI / 180;
+        this.spinSpeedvar = 90; // 45 to 360
+        this.spinSpeed = Math.PI / this.spinSpeedvar;
         this.spinning = false;
-        this.bouncing = false;
+        this.cone = false;
     }
 
     castRays() {
         this.rays = []; // Clear previous rays
-        const angleIncrement = Math.PI * 2 / 18;
+        const angleIncrement = Math.PI * 2 / this.rayAmount;
         const playerCenterX = this.player.x + this.player.width / 2;
         const playerCenterY = this.player.y + this.player.height / 2;
 
         let startAngle = this.currentAngle;
         let endAngle = startAngle + Math.PI * 2;
+
+        // If cone mode is active, adjust the start and end angles to limit the arc
+        if (this.cone) {
+            startAngle += Math.PI * 3 / 4; // Shift start angle to -45 degrees relative to current angle
+            endAngle = startAngle + Math.PI / 2; // Limit arc to 90 degrees
+        }
 
         for (let angle = startAngle; angle < endAngle; angle += angleIncrement) {
             for (let distance = 0; distance < this.maxDistance; distance++) {
