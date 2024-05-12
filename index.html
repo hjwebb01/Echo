@@ -9,6 +9,17 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div style="position: absolute; top: 50px; left: 10px;">
+        <input type="range" id="rayAmountSlider" min="1" max="180" value="90">
+        <input type="range" id="maxDistanceSlider" min="10" max="500" value="100">
+        <input type="range" id="spinSpeedSlider" min="45" max="360" value="90" step="0.01">
+    </div>
+    <div style="position: absolute; top: 25px; left: 10px;">
+        <button id="toggleEcho">Ring Bell</button>
+        <button id="toggleVisibility">Toggle Ray Visibility</button>
+        <button id="toggleSpinning">Toggle Ray Spinning</button>
+        <button id="toggleCone">Toggle Ray Cone Shape</button>
+    </div>
     <canvas id="gameCanvas" width="1280" height="720"></canvas>
     <script type="module" src="main.js"></script>
 </body>
