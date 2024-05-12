@@ -164,6 +164,39 @@
         animateRadarExpansion();
     });
 
+    function animateRadarExpansion() {
+
+        const animationSpeed = 3;
+        const expansionInterval = setInterval(() => {
+            if (radar.radius < radar.maxRadius) {
+                radar.radius += animationSpeed;
+                draw();
+            } else {
+                clearInterval(expansionInterval);
+                animateRadarContraction();
+            }
+        }, 10);
+    }
+
+    function animateRadarContraction() {
+
+        const contractionInterval = setInterval(() => {
+            if (radar.radius > 0) {
+                radar.radius--;
+                draw();
+                
+
+            } else {
+                clearInterval(contractionInterval);
+                radar.active = false;
+                radar.radius = 0;
+                draw();
+            }
+        }, 10);
+    }
+
+    draw();
+
 
 
 </script>
