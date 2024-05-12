@@ -95,6 +95,77 @@
         drawPlayer();
         drawRadar();
     }
+
+    function movePlayer(direction) {
+        switch (direction) {
+            case 'up':
+
+                player.y -= player.speed;
+                break;
+
+            case 'down':
+
+                player.y += player.speed;
+                break;
+                
+            case 'left':
+                player.x -= player.speed;
+                break;
+            case 'right':
+                player.x += player.speed;
+                break;
+        }
+    }
+
+    function checkCollision() {
+
+        let collision = false;
+
+        maze.forEach(wall => {
+            
+            if (
+                player.x < wall.x + wall.width &&
+                player.x + player.width > wall.x &&
+                player.y < wall.y + wall.height &&
+                player.y + player.height > wall.y
+            ) {
+                collision = true;
+            }
+        });
+
+        return collision;
+    }
+
+    window.addEventListener('keydown', function(event) {
+        switch (event.key) {
+            case 'ArrowUp':
+                movePlayer('up');
+                break;
+            case 'ArrowDown':
+                movePlayer('down');
+                break;
+            case 'ArrowLeft':
+                movePlayer('left');
+                break;
+            case 'ArrowRight':
+                movePlayer('right');
+                break;
+        }
+        if (checkCollision()) {
+            movePlayer(event.key.replace('Arrow', '').toLowerCase());
+        }
+        draw();
+    });
+
+    canvas.addEventListener('click', function(event) {
+        radar.x = player.x + player.width / 2;
+        radar.y = player.y + player.height / 2;
+        radar.active = true;
+        animateRadarExpansion();
+    });
+
+
+
 </script>
 </body>
 </html>
