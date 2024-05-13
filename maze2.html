@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar-Maze Game</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background-color: black;
+    }
+    canvas {
+        display: block;
+        margin: auto;
+        background-color: #f0f0f0;
+        border: 1px solid #000;
+    }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const player = {
+        x: 50,
+        y: 50,
+        width: 20,
+        height: 20,
+        color: 'blue',
+        speed: 3
+    };
+
+    const maze = [
+        { x: 100, y: 100, width: 20, height: 200 },
+        { x: 100, y: 100, width: 400, height: 20 },
+        { x: 500, y: 100, width: 20, height: 300 },
+        { x: 100, y: 380, width: 400, height: 20 },
+        { x: 200, y: 200, width: 300, height: 20 },
+        // Additional maze walls
+        { x: 200, y: 100, width: 20, height: 100 },
+        { x: 300, y: 100, width: 20, height: 100 },
+        { x: 400, y: 200, width: 20, height: 180 },
+        { x: 200, y: 200, width: 180, height: 20 },
+        { x: 200, y: 300, width: 180, height: 20 },
+        { x: 200, y: 300, width: 20, height: 60 },
+        { x: 300, y: 300, width: 20, height: 60 },
+        // Goal area
+        { x: 540, y: 340, width: 40, height: 40 }
+    ];
+
+    const goal = {
+        x: 540,
+        y: 340,
+        width: 40,
+        height: 40
+    };
+
+    const radar = {
+        x: 0,
+        y: 0,
+        radius: 0,
+        maxRadius: 150,
+        color: 'rgba(255, 0, 0, 0.2)',
+        active: false
+    };
+
+    function drawPlayer() {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function drawMaze() {
+        maze.forEach(wall => {
+            if (radar.active && isWallInRadar(wall)) {
+                ctx.fillStyle = 'black';
+            } else {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+            }
+            ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+        });
+    }
+
+    function isWallInRadar(wall) {
+        const distance = Math.sqrt(Math.pow(radar.x - (wall.x + wall.width / 2), 2) + Math.pow(radar.y - (wall.y + wall.height / 2), 2));
+        return distance <= radar.radius;
+    }
+
+    function drawRadar() {
+        if (radar.active) {
+            ctx.beginPath();
+            ctx.arc(radar.x, radar.y, radar.radius, 0, Math.PI * 2);
+            ctx.fillStyle = radar.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+
+    function drawGoal() {
+        ctx.fillStyle = 'green';
+        ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawMaze();
+        drawPlayer();
+        drawGoal();
+        drawRadar();
+    }
+
+    function movePlayer(direction) {
+        switch (direction) {
+            case 'up':
+                player.y -= player.speed;
+                break;
+            case 'down':
+                player.y += player.speed;
+                break;
+            case 'left':
+                player.x -= player.speed;
+                break;
+            case 'right':
+                player.x += player.speed;
+                break;
+        }
+    }
+
+    function checkCollision() {
+        let collision = false;
+        maze.forEach(wall => {
+            if (
+                player.x < wall.x + wall.width &&
+                player.x + player.width > wall.x &&
+                player.y < wall.y + wall.height &&
+                player.y + player.height > wall.y
+            ) {
+                collision = true;
+            }
+        });
+        return collision;
+    }
+
+    function checkGoal() {
+        if (
+            player.x < goal.x + goal.width &&
+            player.x + player.width > goal.x &&
+            player.y < goal.y + goal.height &&
+            player.y + player.height > goal.y
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    window.addEventListener('keydown', function(event) {
+        switch (event.key) {
+            case 'ArrowUp':
+                movePlayer('up');
+                break;
+            case 'ArrowDown':
+                movePlayer('down');
+                break;
+            case 'ArrowLeft':
+                movePlayer('left');
+                break;
+            case 'ArrowRight':
+                movePlayer('right');
+                break;
+        }
+        if (checkCollision()) {
+            movePlayer(event.key.replace('Arrow', '').toLowerCase());
+        }
+        if (checkGoal()) {
+            alert('Congratulations! You reached the goal!');
+        }
+        draw();
+    });
+
+    canvas.addEventListener('click', function(event) {
+        radar.x = player.x + player.width / 2;
+        radar.y = player.y + player.height / 2;
+        radar.active = true;
+        animateRadarExpansion();
+    });
+
+    function animateRadarExpansion() {
+        const animationSpeed = 3;
+        const expansionInterval = setInterval(() => {
+            if (radar.radius < radar.maxRadius) {
+                radar.radius += animationSpeed;
+                draw();
+            } else {
+                clearInterval(expansionInterval);
+                animateRadarContraction();
+            }
+        }, 10);
+    }
+
+    function animateRadarContraction() {
+        const contractionInterval = setInterval(() => {
+            if (radar.radius > 0) {
+                radar.radius--;
+                draw();
+            } else {
+                clearInterval(contractionInterval);
+                radar.active = false;
+                radar.radius = 0;
+                draw();
+            }
+        }, 10);
+    }
+
+    draw();
+</script>
+</body>
+</html>
