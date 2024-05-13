@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const ctx = canvas.getContext('2d');
     canvas.style.backgroundColor = '#000'; // Background color
 
-    // Sliders
+    /* Sliders RECYCLED STUFF
     const rayAmountSlider = document.getElementById('rayAmountSlider');
     const maxDistanceSlider = document.getElementById('maxDistanceSlider');
     const spinSpeedSlider = document.getElementById('spinSpeedSlider');
@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
     toggleCone.addEventListener('click', () => {
         raycast.cone = !raycast.cone;
     });
+    */
 
     // Sounds (More to come)
     var soundBell = new Audio('Bell.mp3')
@@ -94,6 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
             case "ArrowDown":  player.activeDirections.down = true; break;
             case "ArrowLeft":  player.activeDirections.left = true; break;
             case "ArrowRight": player.activeDirections.right = true; break;
+            /* SCRAPPED
             case 'e':
                 if (canPing && !SonarEcho.active) {
                     SonarEcho.active = true;
@@ -105,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }, 5000);
                 }
                 break;
+            */
             case 'r':
                 raycast.visibility = !raycast.visibility;
                 break;
@@ -113,7 +116,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
             case 'c':
                 raycast.cone = !raycast.cone; // Toggle cone shape on or off
-                break;    
+                break; 
+            case 'e':
+                raycast.triggerPing();
+                break;
         }
     });
 
@@ -132,6 +138,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Draw the base wall
             ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
     
+            /* SCRAPPED
             // Draw echolocation effect from active and fading echoes
             echoes.forEach((echo, index) => {
                 const timeElapsed = (Date.now() - echo.timestamp) / 1000; // Time in seconds
@@ -180,11 +187,13 @@ document.addEventListener("DOMContentLoaded", function() {
     
             ctx.fillStyle = '#000';
             ctx.fillRect(innerX, innerY, innerWidth, innerHeight);
+            */
             ctx.strokeStyle = '#000';
             ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
         });
     }
     
+    /* SCRAPPED
     function getVisibleWallSides(wall) {
         const playerCenterX = player.x + player.width / 2;
         const playerCenterY = player.y + player.height / 2;
@@ -236,6 +245,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     }
+    */
 
     function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -244,13 +254,13 @@ document.addEventListener("DOMContentLoaded", function() {
         drawWalls();
         player.draw(ctx);
 
-        drawSonarEcho();
         requestAnimationFrame(gameLoop);
-
+        
+        if (raycast.pingActive) {
+            raycast.expandRays(); // Gradually increase the distance of the rays
+        }
         raycast.castRays();
         raycast.drawRays(ctx);
-
-        updateRaycastSettings();
     }
 
     gameLoop();

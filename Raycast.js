@@ -4,14 +4,17 @@ export class Raycast {
         this.player = player;
         this.walls = walls;
         this.rays = [];
-        this.rayAmount = 90; // 1 to 360
-        this.maxDistance = 100; // 10 to 500
+        this.hitPoints = []; // Store hit points with timestamps and color intensity
+        this.rayAmount = 180;
+        this.maxDistance = 200;
         this.visibility = false;
         this.currentAngle = 0;
-        this.spinSpeedvar = 90; // 45 to 360
+        this.spinSpeedvar = 90;
         this.spinSpeed = Math.PI / this.spinSpeedvar;
         this.spinning = false;
         this.cone = false;
+        this.pingActive = false; // This will be set true only for a frame when 'e' is pressed
+        this.currentDistance = 0; // To track the current distance of expanding rays
     }
 
     castRays() {
@@ -23,35 +26,53 @@ export class Raycast {
         let startAngle = this.currentAngle;
         let endAngle = startAngle + Math.PI * 2;
 
-        // If cone mode is active, adjust the start and end angles to limit the arc
         if (this.cone) {
-            startAngle += Math.PI * 3 / 4; // Shift start angle to -45 degrees relative to current angle
-            endAngle = startAngle + Math.PI / 2; // Limit arc to 90 degrees
+            startAngle += Math.PI * 3 / 4;
+            endAngle = startAngle + Math.PI / 2;
         }
 
         for (let angle = startAngle; angle < endAngle; angle += angleIncrement) {
-            for (let distance = 0; distance < this.maxDistance; distance++) {
+            for (let distance = 0; distance < this.currentDistance; distance++) {
                 const rayX = Math.round(playerCenterX + distance * Math.cos(angle));
                 const rayY = Math.round(playerCenterY + distance * Math.sin(angle));
 
                 if (this.rayHitsWall(rayX, rayY)) {
                     this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
+                    if (this.pingActive) {
+                        let fraction = (this.maxDistance - distance) / this.maxDistance;
+                        let intensity = Math.pow(fraction, 3); // Cubing the fraction
+                        let color = `rgba(255, 255, 255, ${intensity})`; // Interpolate color based on distance
+                        this.hitPoints.push({x: rayX, y: rayY, time: Date.now(), color});
+                    }
                     break; // Stop this ray if it hits a wall
                 }
 
-                if (distance === this.maxDistance - 1) { // Ray reached maximum distance without hitting a wall
+                if (distance === this.currentDistance - 1) { // Ray reached current expanding distance without hitting a wall
                     this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
                 }
             }
         }
 
-        // Spin stuff
         if (this.spinning) {
             this.currentAngle += this.spinSpeed;
             if (this.currentAngle >= Math.PI * 2) {
-                this.currentAngle -= Math.PI * 2; // Normalize angle
+                this.currentAngle -= Math.PI * 2;
             }
         }
+    }
+
+    expandRays() {
+        const expansionSpeed = 5; // Increase this value to make the expansion faster
+        if (this.currentDistance < this.maxDistance) {
+            this.currentDistance += expansionSpeed; // Increase the distance of the rays faster
+        } else {
+            this.pingActive = false; // Stop expanding when max distance is reached
+        }
+    }
+
+    triggerPing() {
+        this.pingActive = true; // Set the ping flag true
+        this.currentDistance = 0; // Reset the current distance
     }
 
     rayHitsWall(rayX, rayY) {
@@ -71,5 +92,17 @@ export class Raycast {
             });
             ctx.stroke();
         }
+
+        let currentTime = Date.now();
+        this.hitPoints = this.hitPoints.filter(point => {
+            return currentTime - point.time < 3000; // Only keep markers less than 3 seconds old
+        });
+
+        this.hitPoints.forEach(point => {
+            ctx.fillStyle = point.color;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        });
     }
 }
