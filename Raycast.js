@@ -99,9 +99,20 @@ export class Raycast {
         });
 
         this.hitPoints.forEach(point => {
+            const currentTime = Date.now();
+            const elapsedTime = currentTime - point.time;
+            const pulsePeriod = 800; // Period of the pulsation in milliseconds
+            const minRadius = 1.5;
+            const maxRadius = 3;
+            const amplitude = (maxRadius - minRadius) / 2;
+            const baseRadius = minRadius + amplitude;
+        
+            // Calculate the radius using a sinusoidal function based on the elapsed time
+            const radius = baseRadius + amplitude * Math.sin((2 * Math.PI / pulsePeriod) * elapsedTime);
+        
             ctx.fillStyle = point.color;
             ctx.beginPath();
-            ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+            ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
             ctx.fill();
         });
     }
