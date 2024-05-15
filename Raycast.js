@@ -122,3 +122,4 @@ export class Raycast {
             ctx.fill();
         });
     }
+}
