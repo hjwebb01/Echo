@@ -23,37 +23,39 @@ export class Raycast {
         const angleIncrement = Math.PI * 2 / this.rayAmount;
         const playerCenterX = this.player.x + this.player.width / 2;
         const playerCenterY = this.player.y + this.player.height / 2;
-
+    
         let startAngle = this.currentAngle;
         let endAngle = startAngle + Math.PI * 2;
-
+    
         if (this.cone) {
             startAngle += Math.PI * 3 / 4;
             endAngle = startAngle + Math.PI / 2;
         }
-
+    
         for (let angle = startAngle; angle < endAngle; angle += angleIncrement) {
             for (let distance = 0; distance < this.currentDistance; distance++) {
                 const rayX = Math.round(playerCenterX + distance * Math.cos(angle));
                 const rayY = Math.round(playerCenterY + distance * Math.sin(angle));
-
+    
                 if (this.rayHitsWall(rayX, rayY)) {
                     this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
                     if (this.pingActive || this.alwaysPing) {
-                        let fraction = (this.maxDistance - distance) / this.maxDistance;
-                        let intensity = Math.pow(fraction, 3); // Cubing the fraction
-                        let color = `rgba(255, 255, 255, ${intensity})`; // Interpolate color based on distance
-                        this.hitPoints.push({x: rayX, y: rayY, time: Date.now(), color});
+                        let fraction = distance / this.maxDistance; // Change to distance traveled fraction
+                        let intensity = Math.pow(fraction, 1.5); // Cubing the fraction
+                        let color = `rgba(255, 255, 255, ${1 - intensity})`; // Interpolate color based on distance
+                        let timeReduction = (1 - fraction) * 1000; // Calculate time reduction inversely
+                        let timeVisible = 400 + timeReduction; // Ensure at least 1 second visibility
+                        this.hitPoints.push({x: rayX, y: rayY, time: Date.now(), color, timeVisible});
                     }
                     break; // Stop this ray if it hits a wall
                 }
-
+    
                 if (distance === this.currentDistance - 1) { // Ray reached current expanding distance without hitting a wall
                     this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
                 }
             }
         }
-
+    
         if (this.spinning) {
             this.currentAngle += this.spinSpeed;
             if (this.currentAngle >= Math.PI * 2) {
@@ -61,6 +63,7 @@ export class Raycast {
             }
         }
     }
+    
 
     expandRays() {
         const expansionSpeed = 5; // Increase this value to make the expansion faster
@@ -93,29 +96,29 @@ export class Raycast {
             });
             ctx.stroke();
         }
-
+    
         let currentTime = Date.now();
         this.hitPoints = this.hitPoints.filter(point => {
-            return currentTime - point.time < 3000; // Only keep markers less than 3 seconds old
+            return currentTime - point.time < point.timeVisible; // Use the dynamically adjusted visibility time
         });
-
+    
         this.hitPoints.forEach(point => {
-            // Ping circle properties
-            const currentTime = Date.now();
             const elapsedTime = currentTime - point.time;
-            const pulsePeriod = 800; // Period of the pulsation in milliseconds
-            const minRadius = 1.5;
-            const maxRadius = 3;
-            const amplitude = (maxRadius - minRadius) / 2;
-            const baseRadius = minRadius + amplitude;
-        
-            // Calculate the radius using a sinusoidal function based on the elapsed time
-            const radius = baseRadius + amplitude * Math.sin((2 * Math.PI / pulsePeriod) * elapsedTime);
-        
+            const pulseDuration = 800; // Total duration for one full pulse cycle
+            const minRadius = 3;
+            const maxRadius = 10;
+    
+            let radius;
+            if (elapsedTime < pulseDuration) {
+                const phase = (elapsedTime / pulseDuration) * Math.PI;
+                radius = minRadius + (maxRadius - minRadius) * Math.sin(phase);
+            } else {
+                radius = minRadius;
+            }
+    
             ctx.fillStyle = point.color;
             ctx.beginPath();
             ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
             ctx.fill();
         });
     }
-}
