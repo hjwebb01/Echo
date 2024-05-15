@@ -1,20 +1,21 @@
 export class Raycast {
-    constructor(canvas, player, walls) {
+    constructor(canvas, player, walls, rayAmount, maxDistance, spinSpeedvar, spinning, cone, alwaysPing) {
         this.canvas = canvas;
         this.player = player;
         this.walls = walls;
         this.rays = [];
         this.hitPoints = []; // Store hit points with timestamps and color intensity
-        this.rayAmount = 180;
-        this.maxDistance = 200;
+        this.rayAmount = rayAmount; // 180 Defualt
+        this.maxDistance = maxDistance; // 200 Default
         this.visibility = false;
         this.currentAngle = 0;
-        this.spinSpeedvar = 90;
+        this.spinSpeedvar = spinSpeedvar; // 90 Default
         this.spinSpeed = Math.PI / this.spinSpeedvar;
-        this.spinning = false;
-        this.cone = false;
+        this.spinning = spinning; // false default
+        this.cone = cone; // false default
         this.pingActive = false; // This will be set true only for a frame when 'e' is pressed
         this.currentDistance = 0; // To track the current distance of expanding rays
+        this.alwaysPing = alwaysPing;
     }
 
     castRays() {
@@ -38,7 +39,7 @@ export class Raycast {
 
                 if (this.rayHitsWall(rayX, rayY)) {
                     this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
-                    if (this.pingActive) {
+                    if (this.pingActive || this.alwaysPing) {
                         let fraction = (this.maxDistance - distance) / this.maxDistance;
                         let intensity = Math.pow(fraction, 3); // Cubing the fraction
                         let color = `rgba(255, 255, 255, ${intensity})`; // Interpolate color based on distance
@@ -99,6 +100,7 @@ export class Raycast {
         });
 
         this.hitPoints.forEach(point => {
+            // Ping circle properties
             const currentTime = Date.now();
             const elapsedTime = currentTime - point.time;
             const pulsePeriod = 800; // Period of the pulsation in milliseconds
