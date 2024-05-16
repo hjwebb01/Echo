@@ -11,3 +11,42 @@ html, body {
 canvas {
     background: #000;
 }
+
+#buttonContainer {
+    position: absolute;
+    top: 15px;
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Ensure it's centered perfectly */
+    display: flex;
+    justify-content: center;
+}
+
+#buttonContainer button {
+    width: 80px;
+    height: 80px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: cover; 
+}
+
+#bellButton {
+    background-image: url('Bell_Echo_Button.png');
+}
+
+#radarButton {
+    background-image: url('Radar_Echo_Button.png');
+}
+
+#buttonContainer button:hover {
+    filter: brightness(80%);
+}
+
+#bellButton.selected {
+    background-image: url('Bell_Echo_Button_Lit.png');
+}
+
+#radarButton.selected {
+    background-image: url('Radar_Echo_Button_Lit.png');
+}

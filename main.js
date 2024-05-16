@@ -1,6 +1,8 @@
 // When launching the .html file, use it via VSCode's Live Server extension
 import { Player } from './Player.js';
 import { Raycast } from './Raycast.js';
+
+// You should probbably use a css style for this instead of dumping it in main
 const menuContainer = document.createElement('div');
 menuContainer.style.position = 'absolute';
 menuContainer.style.top = '50%';
@@ -49,12 +51,35 @@ document.addEventListener("DOMContentLoaded", function() {
     ];
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, walls, 180, 200, 90, false, false, false);
+    const raycastBell = new Raycast(canvas, player, walls, 180, 200, 90, false, false, false, playBell);
     const raycastRadar = new Raycast(canvas, player, walls, 1, 300, 100, true, false, true);
 
     // Array of sound types
     const soundTypes = [raycastBell, raycastRadar];
     let currentType = 0; // Start with the first type (raycastBell)
+
+    // Sound select buttons (assuming we add more in the html)
+    document.getElementById('buttonContainer').addEventListener('click', function(event) {
+        const typeIndex = event.target.getAttribute('data-type');
+        if (typeIndex !== null) {
+            currentType = parseInt(typeIndex, 10); // Convert the data-type value to an integer
+            soundTypes[currentType].triggerPing(); // Trigger the ping for the selected sound type
+            updateButtonSelection(); // Call a function to update the button visuals
+        }
+    });
+    
+    function updateButtonSelection() {
+        // Get all buttons within the container
+        const buttons = document.querySelectorAll('#buttonContainer button');
+        // Iterate over each button and update its class based on whether it's the selected type
+        buttons.forEach((button, index) => {
+            if (index === currentType) {
+                button.classList.add('selected'); // Add 'selected' class to the active type
+            } else {
+                button.classList.remove('selected'); // Remove 'selected' class from other types
+            }
+        });
+    }    
 
     // Event listeners for keyups and keydowns (smoother movement)
     window.addEventListener('keydown', function(event) {

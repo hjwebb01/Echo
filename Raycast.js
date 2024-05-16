@@ -1,5 +1,5 @@
 export class Raycast {
-    constructor(canvas, player, walls, rayAmount, maxDistance, spinSpeedvar, spinning, cone, alwaysPing) {
+    constructor(canvas, player, walls, rayAmount, maxDistance, spinSpeedvar, spinning, cone, alwaysPing, playSoundCallback) {
         this.canvas = canvas;
         this.player = player;
         this.walls = walls;
@@ -16,6 +16,7 @@ export class Raycast {
         this.pingActive = false; // This will be set true only for a frame when 'e' is pressed
         this.currentDistance = 0; // To track the current distance of expanding rays
         this.alwaysPing = alwaysPing;
+        this.playSoundCallback = playSoundCallback;
     }
 
     castRays() {
@@ -75,6 +76,9 @@ export class Raycast {
     }
 
     triggerPing() {
+        if (this.playSoundCallback) { // Sound
+            this.playSoundCallback();
+        }
         this.pingActive = true; // Set the ping flag true
         this.currentDistance = 0; // Reset the current distance
     }
