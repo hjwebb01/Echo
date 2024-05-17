@@ -39,6 +39,11 @@ document.addEventListener("DOMContentLoaded", function() {
         soundBell.play();
     }
 
+    var soundAirhorn = new Audio('Airhorn.mp3')
+    function playAirhorn() {
+        soundAirhorn.play();
+    }
+
     // Player
     const player = new Player(650, 380, 10, 10, 2, canvas);
 
@@ -53,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Raycaster instances
     const raycastBell = new Raycast(canvas, player, walls, 180, 5, 200, 90, false, false, false, playBell, false, 1000);
     const raycastRadar = new Raycast(canvas, player, walls, 1, 30, 300, 100, true, false, true, false, false, 1000);
-    const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, false, true, 600)
+    const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
 
     // Array of sound types
     const soundTypes = [raycastBell, raycastRadar, raycastAirhorn];
