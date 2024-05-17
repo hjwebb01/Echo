@@ -51,11 +51,12 @@ document.addEventListener("DOMContentLoaded", function() {
     ];
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, walls, 180, 200, 90, false, false, false, playBell);
-    const raycastRadar = new Raycast(canvas, player, walls, 1, 300, 100, true, false, true);
+    const raycastBell = new Raycast(canvas, player, walls, 180, 5, 200, 90, false, false, false, playBell, false, 1000);
+    const raycastRadar = new Raycast(canvas, player, walls, 1, 30, 300, 100, true, false, true, false, false, 1000);
+    const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, false, true, 600)
 
     // Array of sound types
-    const soundTypes = [raycastBell, raycastRadar];
+    const soundTypes = [raycastBell, raycastRadar, raycastAirhorn];
     let currentType = 0; // Start with the first type (raycastBell)
 
     // Sound select buttons (assuming we add more in the html)
@@ -94,6 +95,9 @@ document.addEventListener("DOMContentLoaded", function() {
             case '2':
                 currentType = 1; // Switch to raycastRadar
                 break;
+            case '3':
+                currentType = 2; // Switch to raycastAirhorn
+                break;
             case 'r':
                 soundTypes[currentType].visibility = !soundTypes[currentType].visibility;
                 break;
@@ -105,6 +109,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 break; 
             case 'e':
                 soundTypes[currentType].triggerPing();
+                break;
+            case 'a': 
+                soundTypes[currentType].cross = !soundTypes[currentType].cross;
                 break;
         }
     });

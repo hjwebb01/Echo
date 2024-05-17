@@ -39,6 +39,10 @@ canvas {
     background-image: url('Radar_Echo_Button.png');
 }
 
+#airhornButton{
+    background-image: url('Airhorn_Echo_Button.png');
+}
+
 #buttonContainer button:hover {
     filter: brightness(80%);
 }
@@ -49,4 +53,8 @@ canvas {
 
 #radarButton.selected {
     background-image: url('Radar_Echo_Button_Lit.png');
+}
+
+#airhornButton.selected {
+    background-image: url('Airhorn_Echo_Button_Lit.png');
 }
