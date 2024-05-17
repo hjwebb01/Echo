@@ -39,6 +39,12 @@ document.addEventListener("DOMContentLoaded", function() {
         soundBell.play();
     }
 
+    var soundRadar = new Audio('Radar.mp3')
+    soundRadar.loop = true;
+    function playRadar() {
+        soundRadar.play();
+    }
+
     var soundAirhorn = new Audio('Airhorn.mp3')
     function playAirhorn() {
         soundAirhorn.play();
@@ -155,6 +161,16 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         soundTypes[currentType].castRays();
         soundTypes[currentType].drawRays(ctx);
+
+        // Special sound feature for Radar
+        if (currentType === 1) { // Radar is selected
+            if (soundRadar.paused) {
+                soundRadar.play();
+            }
+        } else {
+            soundRadar.pause(); // Pause if Radar is not selected
+            soundRadar.currentTime = 0; // Optionally reset the playback position
+        }
     }
 
     gameLoop();
