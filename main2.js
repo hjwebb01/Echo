@@ -6,11 +6,11 @@ import { Raycast } from './Raycast.js';
 const menuContainer = document.createElement('div');
 menuContainer.style.position = 'absolute';
 menuContainer.style.top = '50%';
-menuContainer.style.left = '50%';
+menuContainer.style.left = '38%'; // 50%
 menuContainer.style.transform = 'translate(-20%, -20%)';
 
 const playButton = document.createElement('button');
-playButton.textContent = 'Play';
+playButton.textContent = 'Use Arrow Keys to move, use Buttons above to create sound (Click here to remove)'; // 'Play'
 playButton.style.padding = '10px 20px';
 playButton.style.fontSize = '20px';
 menuContainer.style.backgroundColor = '#fff';
