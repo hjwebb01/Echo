@@ -52,13 +52,27 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Player
     const player = new Player(650, 380, 50, 50, 2, canvas);
-
     // Walls
+    /*
     const walls = [
         { x: 500, y: 100, width: 100, height: 300 },
         { x: 700, y: 360, width: 150, height: 150 },
         { x: 300, y: 500, width: 330, height: 80 },
         { x: 700, y: 180, width: 300, height: 100}
+    ];
+    */
+    const walls = [
+        { x: 500, y: 100, width: 100, height: 300 },
+        { x: 750, y: 100, width: 150, height: 450 },
+        { x: 0, y: 510, width: 600, height: 210 },
+        { x: 700, y: 180, width: 300, height: 100},
+        { x: 1100, y: 100, width: 100, height: 515 },
+        { x: 600, y: 510, width: 300, height: 105},
+        { x: 500, y: 100, width: 600, height: 0 },
+        { x: 100, y: 180, width: 400, height: 100},
+        { x: 1300, y: 100, width: 100, height: 515 },
+        { x: 1200, y: 615, width: 100, height: 0 },
+        { x: 1400, y: 350, width: 300, height: 100},
     ];
 
     // End point
