@@ -10,8 +10,11 @@ menuContainer.style.left = '38%'; // 50%
 menuContainer.style.transform = 'translate(-20%, -20%)';
 
 const playButton = document.createElement('button');
-playButton.textContent = 'Use Arrow Keys to move, use Buttons above to create sound (Click here to remove)'; // 'Play'
+
+playButton.textContent = 'Use Arrow Keys to move, use Buttons above to create sound\n(Click here to Start)';
 playButton.style.padding = '10px 20px';
+playButton.style.whiteSpace = 'pre-line';
+playButton.innerHTML = playButton.innerHTML.replace('(Click here to Start)', '<strong>(Click here to remove)</strong>');
 playButton.style.fontSize = '20px';
 menuContainer.style.backgroundColor = '#fff';
 menuContainer.style.padding = '20px';
