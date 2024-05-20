@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Player
-    const player = new Player(650, 380, 50, 50, 2, canvas, true);
+    const player = new Player(650, 380, 10, 10, 2, canvas, true);
 
     function changePlayerVisibility() {
         player.visibility = !player.visibility;
