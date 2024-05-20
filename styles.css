@@ -10,8 +10,6 @@ html, body {
 
 canvas {
     background: #000;
-    height: 80%;
-    width: 98%;
 }
 
 #buttonContainer {

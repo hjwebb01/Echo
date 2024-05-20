@@ -1,5 +1,5 @@
 export class Player {
-    constructor(x, y, width, height, moveSpeed, canvas) {
+    constructor(x, y, width, height, moveSpeed, canvas, visibility) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -7,6 +7,7 @@ export class Player {
         this.moveSpeed = moveSpeed;
         this.canvas = canvas;
         this.activeDirections = { up: false, down: false, left: false, right: false }; // Tracking active movement directions
+        this.visibility = visibility;
     }
 
     update(walls) {
@@ -50,7 +51,11 @@ export class Player {
     }
 
     draw(ctx) {
-        ctx.fillStyle = '#FFF';
+        if (this.visibility) {
+            ctx.fillStyle = '#FFF'
+        } else {
+            ctx.fillStyle = '#000'
+        }
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 }

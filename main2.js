@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Player
-    const player = new Player(650, 380, 50, 50, 2, canvas);
+    const player = new Player(650, 380, 10, 10, 2, canvas, false);
     // Walls
     /*
     const walls = [
@@ -140,6 +140,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
             case 'a': 
                 soundTypes[currentType].cross = !soundTypes[currentType].cross;
+                break;
+            case 'b':
+                player.visibility = !player.visibility;
                 break;
         }
     });
