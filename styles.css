@@ -10,6 +10,8 @@ html, body {
 
 canvas {
     background: #000;
+    height: 80%;
+    width: 98%;
 }
 
 #buttonContainer {
@@ -41,6 +43,10 @@ canvas {
 
 #airhornButton{
     background-image: url('Airhorn_Echo_Button.png');
+}
+
+#stopButton {
+    background-image: url('Pause_Button.png');
 }
 
 #buttonContainer button:hover {
