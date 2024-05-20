@@ -6,12 +6,15 @@ import { Raycast } from './Raycast.js';
 const menuContainer = document.createElement('div');
 menuContainer.style.position = 'absolute';
 menuContainer.style.top = '50%';
-menuContainer.style.left = '50%';
-menuContainer.style.transform = 'translate(-50%, -50%)';
+menuContainer.style.left = '38%'; // 50%
+menuContainer.style.transform = 'translate(-20%, -20%)';
 
 const playButton = document.createElement('button');
-playButton.textContent = 'Play';
+
+playButton.textContent = 'Use Arrow Keys to move, use Buttons above to create sound\n(Click here to Start)';
 playButton.style.padding = '10px 20px';
+playButton.style.whiteSpace = 'pre-line';
+playButton.innerHTML = playButton.innerHTML.replace('(Click here to Start)', '<strong>(Click here to remove)</strong>');
 playButton.style.fontSize = '20px';
 menuContainer.style.backgroundColor = '#fff';
 menuContainer.style.padding = '20px';
@@ -51,19 +54,37 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Player
-    const player = new Player(650, 380, 10, 10, 2, canvas);
-
+    const player = new Player(650, 380, 10, 10, 2, canvas, false);
+    
     // Walls
+    /*
     const walls = [
         { x: 500, y: 100, width: 100, height: 300 },
         { x: 700, y: 360, width: 150, height: 150 },
         { x: 300, y: 500, width: 330, height: 80 },
         { x: 700, y: 180, width: 300, height: 100}
     ];
+    */
+    const walls = [
+        { x: 500, y: 100, width: 100, height: 300 },
+        { x: 750, y: 100, width: 150, height: 450 },
+        { x: 0, y: 510, width: 600, height: 210 },
+        { x: 700, y: 180, width: 300, height: 100},
+        { x: 1100, y: 100, width: 100, height: 515 },
+        { x: 600, y: 510, width: 300, height: 105},
+        { x: 500, y: 100, width: 600, height: 0 },
+        { x: 100, y: 180, width: 400, height: 100},
+        { x: 1300, y: 100, width: 100, height: 515 },
+        { x: 1200, y: 615, width: 100, height: 0 },
+        { x: 1400, y: 350, width: 300, height: 100},
+    ];
+
+    // End point
+    const endPoint = { x: 950, y: 400, width: 50, height: 50 };
 
     // Raycaster instances
     const raycastBell = new Raycast(canvas, player, walls, 180, 5, 200, 90, false, false, false, playBell, false, 1000);
-    const raycastRadar = new Raycast(canvas, player, walls, 1, 30, 300, 100, true, false, true, false, false, 1000);
+    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 300, 100, true, true, true, false, false, 1000, true);
     const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
 
     // Array of sound types
@@ -71,33 +92,15 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentType = 0; // Start with the first type (raycastBell)
 
     // Sound select buttons (assuming we add more in the html)
+
     document.getElementById('buttonContainer').addEventListener('click', function(event) {
         const typeIndex = event.target.getAttribute('data-type');
-        if (typeIndex !== null && typeIndex !== "3") {
+        if (typeIndex !== null) {
             currentType = parseInt(typeIndex, 10); // Convert the data-type value to an integer
             soundTypes[currentType].triggerPing(); // Trigger the ping for the selected sound type
             updateButtonSelection(); // Call a function to update the button visuals
         }
-        if (typeIndex === "3") {
-            const pauseButton = document.createElement('button');
-            pauseButton.textContent = 'Pause';
-            pauseButton.style.padding = '10px 20px';
-            pauseButton.style.fontSize = '20px';
-            pauseButton.style.backgroundColor = '#fff';
-            pauseButton.style.color = '#000';
-            pauseButton.style.border = 'none';
-            pauseButton.style.cursor = 'pointer';
 
-            pauseButton.addEventListener('click', () => {
-            player.activeDirections.up = !player.activeDirections.up;
-            player.activeDirections.down = !player.activeDirections.down;
-            player.activeDirections.left = !player.activeDirections.left;
-            player.activeDirections.right = !player.activeDirections.right;
-            pauseButton.textContent = player.activeDirections.up ? 'Pause' : 'Resume';
-            });
-
-            menuContainer.appendChild(pauseButton);
-        }
     });
     
     function updateButtonSelection() {
@@ -144,6 +147,9 @@ document.addEventListener("DOMContentLoaded", function() {
             case 'a': 
                 soundTypes[currentType].cross = !soundTypes[currentType].cross;
                 break;
+            case 'b':
+                player.visibility = !player.visibility;
+                break;
         }
     });
 
@@ -166,11 +172,40 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    function drawEndPoint() {
+        ctx.fillStyle = '#00ff00'; // Fill end point with green color
+        ctx.fillRect(endPoint.x, endPoint.y, endPoint.width, endPoint.height);
+    }
+
+    function checkCollision() {
+        if (
+            player.x < endPoint.x + endPoint.width &&
+            player.x + player.width > endPoint.x &&
+            player.y < endPoint.y + endPoint.height &&
+            player.y + player.height > endPoint.y
+        ) {
+            congratulatePlayer();
+        }
+    }
+
+    function congratulatePlayer() {
+        // Display a congratulatory message
+        const congratsMessage = document.createElement('h1');
+        congratsMessage.textContent = 'Congratulations!';
+        congratsMessage.style.color = '#fff';
+        congratsMessage.style.position = 'absolute';
+        congratsMessage.style.top = '50%';
+        congratsMessage.style.left = '50%';
+        congratsMessage.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(congratsMessage);
+    }
+
     function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         player.update(walls);
         drawWalls();
+        drawEndPoint();
         player.draw(ctx);
 
         requestAnimationFrame(gameLoop);
@@ -191,6 +226,8 @@ document.addEventListener("DOMContentLoaded", function() {
             soundRadar.pause(); // Pause if Radar is not selected
             soundRadar.currentTime = 0; // Optionally reset the playback position
         }
+
+        checkCollision();
     }
 
     gameLoop();
