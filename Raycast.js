@@ -1,5 +1,5 @@
 export class Raycast {
-    constructor(canvas, player, walls, rayAmount, expansionSpeed, maxDistance, spinSpeedvar, spinning, cone, alwaysPing, playSoundCallback, cross, fadeSpeed) {
+    constructor(canvas, player, walls, rayAmount, expansionSpeed, maxDistance, spinSpeedvar, spinning, cone, alwaysPing, playSoundCallback, cross, fadeSpeed, visibility) {
         this.canvas = canvas;
         this.player = player;
         this.walls = walls;
@@ -8,7 +8,7 @@ export class Raycast {
         this.rayAmount = rayAmount; // 180 Defualt
         this.expansionSpeedvar = expansionSpeed;
         this.maxDistance = maxDistance; // 200 Default
-        this.visibility = false;
+        this.visibility = visibility;
         this.currentAngle = 0;
         this.spinSpeedvar = spinSpeedvar; // 90 Default
         this.spinSpeed = Math.PI / this.spinSpeedvar;
@@ -32,8 +32,8 @@ export class Raycast {
         let endAngle = startAngle + Math.PI * 2;
     
         if (this.cone) {
-            startAngle += Math.PI * 3 / 4;
-            endAngle = startAngle + Math.PI / 2;
+            startAngle += Math.PI * 7 / 8;
+            endAngle = startAngle + Math.PI / 10;
         }
     
         for (let angle = startAngle; angle < endAngle; angle += angleIncrement) {
@@ -113,8 +113,9 @@ export class Raycast {
 
     drawRays(ctx) {
         if (this.visibility) {
-            ctx.strokeStyle = 'red';
+            ctx.strokeStyle = 'lightgreen';
             ctx.beginPath();
+            ctx.lineWidth = 5;
             this.rays.forEach(ray => {
                 ctx.moveTo(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
                 ctx.lineTo(ray.x, ray.y);
