@@ -44,7 +44,7 @@ canvas {
 }
 
 #visibilityButton {
-    background-image: url('Pause_Button.png');
+    background-image: url('Visibility_Echo_Button.png');
 }
 
 #buttonContainer button:hover {
@@ -64,5 +64,5 @@ canvas {
 }
 
 #visibilityButton.selected {
-    background-image: url('Pause_Button_Lit.png');
+    background-image: url('Visibility_Echo_Button.png');
 }
