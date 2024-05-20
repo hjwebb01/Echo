@@ -51,7 +51,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Player
-    const player = new Player(650, 380, 10, 10, 2, canvas, false);
+    const player = new Player(650, 380, 50, 50, 2, canvas, true);
+
+    function changePlayerVisibility() {
+        player.visibility = !player.visibility;
+    }
+
+
+    
     // Walls
     /*
     const walls = [
@@ -88,13 +95,20 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentType = 0; // Start with the first type (raycastBell)
 
     // Sound select buttons (assuming we add more in the html)
+
     document.getElementById('buttonContainer').addEventListener('click', function(event) {
         const typeIndex = event.target.getAttribute('data-type');
         if (typeIndex !== null) {
-            currentType = parseInt(typeIndex, 10); // Convert the data-type value to an integer
-            soundTypes[currentType].triggerPing(); // Trigger the ping for the selected sound type
-            updateButtonSelection(); // Call a function to update the button visuals
+            if (typeIndex === '3') {
+                changePlayerVisibility();
+            }
+            else {
+                currentType = parseInt(typeIndex, 10); // Convert the data-type value to an integer
+                soundTypes[currentType].triggerPing(); // Trigger the ping for the selected sound type
+                updateButtonSelection(); // Call a function to update the button visuals
+            }
         }
+
     });
     
     function updateButtonSelection() {

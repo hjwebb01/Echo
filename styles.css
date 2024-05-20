@@ -43,7 +43,7 @@ canvas {
     background-image: url('Airhorn_Echo_Button.png');
 }
 
-#stopButton {
+#visibilityButton {
     background-image: url('Pause_Button.png');
 }
 
@@ -61,4 +61,8 @@ canvas {
 
 #airhornButton.selected {
     background-image: url('Airhorn_Echo_Button_Lit.png');
+}
+
+#visibilityButton.selected {
+    background-image: url('Pause_Button_Lit.png');
 }
