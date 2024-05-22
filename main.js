@@ -83,12 +83,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, walls, 180, 5, 200, 90, false, false, false, playBell, false, 1000);
-    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 300, 100, true, true, true, false, false, 1000, true);
-    const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
+    const raycastBell = new Raycast(canvas, player, walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000);
+    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true);
+    // const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
 
     // Array of sound types
-    const soundTypes = [raycastBell, raycastRadar, raycastAirhorn];
+    const soundTypes = [raycastBell, raycastRadar];
     let currentType = 0; // Start with the first type (raycastBell)
 
     // Sound select buttons (assuming we add more in the html)
@@ -128,9 +128,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
             case '2':
                 currentType = 1; // Switch to raycastRadar
-                break;
-            case '3':
-                currentType = 2; // Switch to raycastAirhorn
                 break;
             case 'r':
                 soundTypes[currentType].visibility = !soundTypes[currentType].visibility;
