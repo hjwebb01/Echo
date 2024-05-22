@@ -14,7 +14,7 @@ canvas {
 
 #buttonContainer {
     position: absolute;
-    top: 15px;
+    top: 5px;
     left: 50%; /* Center horizontally */
     transform: translateX(-50%); /* Ensure it's centered perfectly */
     display: flex;
@@ -22,8 +22,8 @@ canvas {
 }
 
 #buttonContainer button {
-    width: 80px;
-    height: 80px;
+    width: 400px;
+    height: 100px;
     border: none;
     background-color: transparent;
     cursor: pointer;
@@ -32,7 +32,7 @@ canvas {
 }
 
 #bellButton {
-    background-image: url('Bell_Echo_Button.png');
+    background-image: url('Bell_Echo_Button_0.png');
 }
 
 #radarButton {
@@ -43,16 +43,8 @@ canvas {
     background-image: url('Airhorn_Echo_Button.png');
 }
 
-#visibilityButton {
-    background-image: url('Visibility_Echo_Button.png');
-}
-
 #buttonContainer button:hover {
     filter: brightness(80%);
-}
-
-#bellButton.selected {
-    background-image: url('Bell_Echo_Button_Lit.png');
 }
 
 #radarButton.selected {
@@ -61,8 +53,4 @@ canvas {
 
 #airhornButton.selected {
     background-image: url('Airhorn_Echo_Button_Lit.png');
-}
-
-#visibilityButton.selected {
-    background-image: url('Visibility_Echo_Button.png');
 }
