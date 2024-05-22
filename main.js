@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const ctx = canvas.getContext('2d');
     canvas.style.backgroundColor = '#000'; // Background color
 
+    let raycastBellUsageCount = 0;
+    const maxRaycastBellUsage = 3;
+
     // Sounds (More to come)
     var soundBell = new Audio('Bell.mp3')
     function playBell() {
@@ -83,12 +86,12 @@ document.addEventListener("DOMContentLoaded", function() {
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, walls, 180, 5, 200, 90, false, false, false, playBell, false, 1000);
-    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 300, 100, true, true, true, false, false, 1000, true);
-    const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
+    const raycastBell = new Raycast(canvas, player, walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false);
+    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true);
+    // const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
 
     // Array of sound types
-    const soundTypes = [raycastBell, raycastRadar, raycastAirhorn];
+    const soundTypes = [raycastBell, raycastRadar];
     let currentType = 0; // Start with the first type (raycastBell)
 
     // Sound select buttons (assuming we add more in the html)
@@ -96,25 +99,48 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('buttonContainer').addEventListener('click', function(event) {
         const typeIndex = event.target.getAttribute('data-type');
         if (typeIndex !== null) {
-            currentType = parseInt(typeIndex, 10); // Convert the data-type value to an integer
+            let newIndex = parseInt(typeIndex, 10); // Convert the data-type value to an integer
+            if (newIndex === 0 && raycastBellUsageCount >= maxRaycastBellUsage) {
+                // If raycastBell is selected and usage limit is reached, do nothing
+                return;
+            }
+            currentType = newIndex;
             soundTypes[currentType].triggerPing(); // Trigger the ping for the selected sound type
+            if (currentType === 0) { // Only count usages for raycastBell
+                raycastBellUsageCount++;
+            }
             updateButtonSelection(); // Call a function to update the button visuals
         }
-
     });
     
     function updateButtonSelection() {
         // Get all buttons within the container
         const buttons = document.querySelectorAll('#buttonContainer button');
-        // Iterate over each button and update its class based on whether it's the selected type
+        // Iterate over each button and update its class and background based on whether it's the selected type
         buttons.forEach((button, index) => {
+            if (index === 0) { // RaycastBell button specific logic
+                // Update the button's background image according to the usage count
+                button.style.backgroundImage = `url('Bell_Echo_Button_${raycastBellUsageCount}.png')`;
+                
+                // Disable the button if the usage limit is reached
+                if (raycastBellUsageCount >= maxRaycastBellUsage) {
+                    button.disabled = true;
+                    button.classList.add('disabled'); // Assuming a CSS class for disabled appearance
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('disabled');
+                }
+            }
+    
+            // Add or remove 'selected' class based on the active type
             if (index === currentType) {
                 button.classList.add('selected'); // Add 'selected' class to the active type
             } else {
                 button.classList.remove('selected'); // Remove 'selected' class from other types
             }
         });
-    }    
+    }
+    
 
     // Event listeners for keyups and keydowns (smoother movement)
     window.addEventListener('keydown', function(event) {
@@ -128,9 +154,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 break;
             case '2':
                 currentType = 1; // Switch to raycastRadar
-                break;
-            case '3':
-                currentType = 2; // Switch to raycastAirhorn
                 break;
             case 'r':
                 soundTypes[currentType].visibility = !soundTypes[currentType].visibility;

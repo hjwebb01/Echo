@@ -123,14 +123,41 @@ export class Raycast {
             ctx.stroke();
         }
     
+        // Handle fading of the expanding circle
         let currentTime = Date.now();
+        if (!this.visibility && this.currentDistance > 0) {
+            let opacity = 1;
+            if (this.currentDistance >= this.maxDistance) {
+                if (!this.fadeStartTime) {
+                    this.fadeStartTime = currentTime;  // Mark the start of the fade out
+                }
+                const fadeDuration = 1200;  // Fade out over 2000 milliseconds (2 seconds)
+                const fadeElapsed = currentTime - this.fadeStartTime;
+                if (fadeElapsed < fadeDuration) {
+                    opacity = 1 - (fadeElapsed / fadeDuration);  // Linear fade out
+                } else {
+                    opacity = 0;  // Fully transparent after fade duration
+                }
+            } else {
+                this.fadeStartTime = null;  // Reset fade start time if below max distance
+            }
+    
+            if (opacity > 0) {
+                ctx.strokeStyle = `rgba(144, 238, 144, ${opacity})`;  // Light green with calculated opacity
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, this.currentDistance, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+    
         this.hitPoints = this.hitPoints.filter(point => {
-            return currentTime - point.time < point.timeVisible; // Use the dynamically adjusted visibility time
+            return currentTime - point.time < point.timeVisible;  // Use the dynamically adjusted visibility time
         });
     
         this.hitPoints.forEach(point => {
             const elapsedTime = currentTime - point.time;
-            const pulseDuration = 800; // Total duration for one full pulse cycle
+            const pulseDuration = 800;  // Total duration for one full pulse cycle
             const minRadius = 3;
             const maxRadius = 10;
     
@@ -148,4 +175,5 @@ export class Raycast {
             ctx.fill();
         });
     }
+    
 }
