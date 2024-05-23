@@ -3,6 +3,7 @@ import { Player } from './Player.js';
 import { Raycast } from './Raycast.js';
 
 // You should probbably use a css style for this instead of dumping it in main
+/*
 const menuContainer = document.createElement('div');
 menuContainer.style.position = 'absolute';
 menuContainer.style.top = '50%';
@@ -28,9 +29,11 @@ playButton.addEventListener('click', () => {
     menuContainer.style.display = 'none';
     // Start the game here
 });
+*/
 
-menuContainer.appendChild(playButton);
-document.body.appendChild(menuContainer);
+// menuContainer.appendChild(playButton);
+// document.body.appendChild(menuContainer);
+
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -38,6 +41,63 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let raycastBellUsageCount = 0;
     const maxRaycastBellUsage = 3;
+
+    // Better intro text stuff
+    let currentTextIndex = 0;
+    let textFadeInStarted = false;
+    let startupTexts = [
+        { text: "Navigate your vehicle with the arrow keys.", opacity: 0, y: canvas.height / 2 - 20 },
+        { text: "Produce radars by clicking your controls at the top, you've been delegated 3 sonar blasts.", opacity: 0, y: canvas.height / 2 + 20 },
+        { text: "Look for the exit, it will ping green, the walls white.", opacity: 0, y: canvas.height / 2 + 60  },
+        { text: "Start your sonar at the top right to begin.", opacity: 0, y: canvas.height / 2 + 100 }
+    ];
+
+    function updateTextFadeIn() {
+        if (currentTextIndex < startupTexts.length) {
+            let text = startupTexts[currentTextIndex];
+            if (text.opacity < 1) {
+                text.opacity += 0.01; // Adjust for desired fade-in speed
+            } else {
+                currentTextIndex++; // Move to the next text after current is fully visible
+            }
+        }
+    }
+    
+    // THIS PART SUCKED
+    function drawStartupTexts() {
+    startupTexts.forEach(text => {
+        let xPosition = canvas.width / 2; // Center alignment starting position
+        ctx.textAlign = 'center';
+        ctx.font = '20px Verdana';
+
+        if (text.text.includes('green') || text.text.includes('white')) {
+            // Split the sentence to color words differently
+            let parts = text.text.split(/(green|white)/);
+            let accumulatedWidth = 0;
+
+            parts.forEach(part => {
+                ctx.fillStyle = `rgba(150, 150, 150, ${text.opacity})`; // Default light grey color
+                if (part === 'green') {
+                    ctx.fillStyle = `rgba(0, 255, 0, ${text.opacity})`; // Green color
+                } else if (part === 'white') {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${text.opacity})`; // White color
+                }
+
+                // Calculate the width of the part and adjust position
+                let metrics = ctx.measureText(part);
+                let partWidth = metrics.width;
+                let partX = xPosition - ctx.measureText(text.text).width / 2 + accumulatedWidth + partWidth / 2;
+
+                ctx.fillText(part, partX, text.y);
+                accumulatedWidth += partWidth; // Accumulate width to adjust next part position
+            });
+        } else {
+            // If the text does not contain 'green' or 'white'
+            ctx.fillStyle = `rgba(150, 150, 150, ${text.opacity})`; // Light grey color
+            ctx.fillText(text.text, xPosition, text.y);
+        }
+    });
+}
 
     // Sounds (More to come)
     var soundBell = new Audio('Bell.mp3')
@@ -60,14 +120,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const player = new Player(650, 380, 10, 10, 2, canvas, false);
     
     // Walls
-    /*
-    const walls = [
-        { x: 500, y: 100, width: 100, height: 300 },
-        { x: 700, y: 360, width: 150, height: 150 },
-        { x: 300, y: 500, width: 330, height: 80 },
-        { x: 700, y: 180, width: 300, height: 100}
-    ];
-    */
     const walls = [
         { x: 500, y: 100, width: 100, height: 300 },
         { x: 750, y: 100, width: 150, height: 450 },
@@ -82,8 +134,13 @@ document.addEventListener("DOMContentLoaded", function() {
         { x: 1400, y: 350, width: 300, height: 100},
     ];
 
-    // End point
+    // Listen I know I know I should (probably) make a class for this stuff
+    // but I will when I got more time alright leave me alone
+    // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
+    let endpointActive = false; // To check if the endpoint was activated
+    let endpointFadeTime = 0; // Counter for the fade effect
+    const endpointFadeDuration = 120; // Duration for the fade effect (in frames)
 
     // Raycaster instances
     const raycastBell = new Raycast(canvas, player, walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, endPoint);
@@ -95,10 +152,14 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentType = 0; // Start with the first type (raycastBell)
 
     // Sound select buttons (assuming we add more in the html)
-
     document.getElementById('buttonContainer').addEventListener('click', function(event) {
         const typeIndex = event.target.getAttribute('data-type');
         if (typeIndex !== null) {
+            if (!endpointActive) { // Fade the endpoint away
+                endpointActive = true;
+                endpointFadeTime = 0;
+            }
+            textFadeInStarted = true; // Hide the intro text
             let newIndex = parseInt(typeIndex, 10); // Convert the data-type value to an integer
             if (newIndex === 0 && raycastBellUsageCount >= maxRaycastBellUsage) {
                 // If raycastBell is selected and usage limit is reached, do nothing
@@ -196,9 +257,18 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function drawEndPoint() {
-        ctx.fillStyle = '#000'; // Fill end point with green color
+        let fadeFactor = endpointFadeTime / endpointFadeDuration;
+        if (endpointActive && endpointFadeTime < endpointFadeDuration) {
+            // Calculate color components based on the fade factor
+            let green = 200 * (1 - fadeFactor);
+            ctx.fillStyle = `rgb(0, ${green}, 0)`;
+            endpointFadeTime++; // Increment fade time
+        } else {
+            ctx.fillStyle = '#000'; // Set to black after fade is complete
+        }
         ctx.fillRect(endPoint.x, endPoint.y, endPoint.width, endPoint.height);
     }
+    
 
     function checkCollision() {
         if (
@@ -230,6 +300,11 @@ document.addEventListener("DOMContentLoaded", function() {
         drawWalls();
         drawEndPoint();
         player.draw(ctx);
+
+        if (!textFadeInStarted) { // Intro text
+            updateTextFadeIn();
+            drawStartupTexts();
+        }
 
         requestAnimationFrame(gameLoop);
         
