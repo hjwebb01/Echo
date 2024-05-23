@@ -1,8 +1,9 @@
 export class Raycast {
-    constructor(canvas, player, walls, rayAmount, expansionSpeed, maxDistance, spinSpeedvar, spinning, cone, alwaysPing, playSoundCallback, cross, fadeSpeed, visibility) {
+    constructor(canvas, player, walls, rayAmount, expansionSpeed, maxDistance, spinSpeedvar, spinning, cone, alwaysPing, playSoundCallback, cross, fadeSpeed, visibility, endPoint) {
         this.canvas = canvas;
         this.player = player;
         this.walls = walls;
+        this.endPoint = endPoint;
         this.rays = [];
         this.hitPoints = []; // Store hit points with timestamps and color intensity
         this.rayAmount = rayAmount; // 180 Defualt
@@ -52,18 +53,22 @@ export class Raycast {
             for (let distance = 0; distance < this.currentDistance; distance++) {
                 const rayX = Math.round(playerCenterX + distance * Math.cos(angle));
                 const rayY = Math.round(playerCenterY + distance * Math.sin(angle));
-    
-                if (this.rayHitsWall(rayX, rayY)) {
-                    this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle});
+                const collision = this.rayHits(rayX, rayY);
+
+                if (collision.hitsWall || collision.hitsEndPoint) {
+                    this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle, hitsEndPoint: collision.hitsEndPoint});
                     if (this.pingActive || this.alwaysPing) {
-                        let fraction = distance / this.maxDistance; // Change to distance traveled fraction
-                        let intensity = Math.pow(fraction, 1.5); // Cubing the fraction
-                        let color = `rgba(255, 255, 255, ${1 - intensity})`; // Interpolate color based on distance
-                        let timeReduction = (1 - fraction) * this.fadeSpeed; // Calculate time reduction inversely
-                        let timeVisible = 400 + timeReduction; // Ensure at least 1 second visibility
+                        let fraction = distance / this.maxDistance;
+                        let intensity = Math.pow(fraction, 0.1);
+                        let color = `rgba(255, 255, 255, ${1 - intensity})`;
+                        if (collision.hitsEndPoint) {
+                            color = `rgba(0, 255, 0, ${1 - intensity})`; // Green for endPoint hits
+                        }
+                        let timeReduction = (1 - fraction) * this.fadeSpeed;
+                        let timeVisible = 400 + timeReduction;
                         this.hitPoints.push({x: rayX, y: rayY, time: Date.now(), color, timeVisible});
                     }
-                    break; // Stop this ray if it hits a wall
+                    break;
                 }
     
                 if (distance === this.currentDistance - 1) { // Ray reached current expanding distance without hitting a wall
@@ -98,17 +103,18 @@ export class Raycast {
         this.currentDistance = 0; // Reset the current distance
     }
 
-    rayHitsWall(rayX, rayY) {
-        // Check if the ray hits any wall
+    rayHits(rayX, rayY) {
+        // Check collision with walls
         const hitsWall = this.walls.some(wall => {
             return (rayX >= wall.x && rayX <= wall.x + wall.width &&
                     rayY >= wall.y && rayY <= wall.y + wall.height);
         });
-    
-        // Check if the ray hits the canvas boundaries
-        const hitsCanvasEdge = rayX <= 0 || rayX >= this.canvas.width || rayY <= 0 || rayY >= this.canvas.height;
-    
-        return hitsWall || hitsCanvasEdge;
+
+        // Check collision with endPoint
+        const hitsEndPoint = rayX >= this.endPoint.x && rayX <= this.endPoint.x + this.endPoint.width &&
+                            rayY >= this.endPoint.y && rayY <= this.endPoint.y + this.endPoint.height;
+
+        return { hitsWall, hitsEndPoint };
     }    
 
     drawRays(ctx) {

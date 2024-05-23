@@ -86,9 +86,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false);
-    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true);
-    // const raycastAirhorn = new Raycast(canvas, player, walls, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
+    const raycastBell = new Raycast(canvas, player, walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, endPoint);
+    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, endPoint);
+    // const raycastAirhorn = new Raycast(canvas, player, walls, endPoint, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
 
     // Array of sound types
     const soundTypes = [raycastBell, raycastRadar];
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function drawEndPoint() {
-        ctx.fillStyle = '#00ff00'; // Fill end point with green color
+        ctx.fillStyle = '#000'; // Fill end point with green color
         ctx.fillRect(endPoint.x, endPoint.y, endPoint.width, endPoint.height);
     }
 
