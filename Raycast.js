@@ -55,7 +55,7 @@ export class Raycast {
                 const rayY = Math.round(playerCenterY + distance * Math.sin(angle));
                 const collision = this.rayHits(rayX, rayY);
 
-                if (collision.hitsWall || collision.hitsEndPoint) {
+                if (collision.hitsWall || collision.hitsEndPoint || collision.hitsCanvasEdge) {
                     this.rays.push({x: rayX, y: rayY, distance: distance, angle: angle, hitsEndPoint: collision.hitsEndPoint});
                     if (this.pingActive || this.alwaysPing) {
                         let fraction = distance / this.maxDistance;
@@ -114,7 +114,15 @@ export class Raycast {
         const hitsEndPoint = rayX >= this.endPoint.x && rayX <= this.endPoint.x + this.endPoint.width &&
                             rayY >= this.endPoint.y && rayY <= this.endPoint.y + this.endPoint.height;
 
-        return { hitsWall, hitsEndPoint };
+         // Check if the ray hits the canvas boundaries
+        const hitsCanvasEdge = rayX <= 0 || rayX >= this.canvas.width || rayY <= 0 || rayY >= this.canvas.height;
+
+        // Return an object with the results of all checks
+        return {
+            hitsWall: hitsWall,
+            hitsEndPoint: hitsEndPoint,
+            hitsCanvasEdge: hitsCanvasEdge
+        };
     }    
 
     drawRays(ctx) {
