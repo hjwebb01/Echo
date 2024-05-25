@@ -1,38 +1,7 @@
 // When launching the .html file, use it via VSCode's Live Server extension
 import { Player } from './Player.js';
 import { Raycast } from './Raycast.js';
-
-// You should probbably use a css style for this instead of dumping it in main
-/*
-const menuContainer = document.createElement('div');
-menuContainer.style.position = 'absolute';
-menuContainer.style.top = '50%';
-menuContainer.style.left = '38%'; // 50%
-menuContainer.style.transform = 'translate(-20%, -20%)';
-
-const playButton = document.createElement('button');
-
-playButton.textContent = 'Use Arrow Keys to move, use Buttons above to create sound\n(Click here to Start)';
-playButton.style.padding = '10px 20px';
-playButton.style.whiteSpace = 'pre-line';
-playButton.innerHTML = playButton.innerHTML.replace('(Click here to Start)', '<strong>(Click here to remove)</strong>');
-playButton.style.fontSize = '20px';
-menuContainer.style.backgroundColor = '#fff';
-menuContainer.style.padding = '20px';
-menuContainer.style.borderRadius = '10px';
-playButton.style.backgroundColor = '#fff';
-playButton.style.color = '#000';
-playButton.style.border = 'none';
-playButton.style.cursor = 'pointer';
-
-playButton.addEventListener('click', () => {
-    menuContainer.style.display = 'none';
-    // Start the game here
-});
-*/
-
-// menuContainer.appendChild(playButton);
-// document.body.appendChild(menuContainer);
+import { Level } from './Level.js';
 
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
@@ -43,61 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const maxRaycastBellUsage = 3;
 
     // Better intro text stuff
-    let currentTextIndex = 0;
     let textFadeInStarted = false;
-    let startupTexts = [
-        { text: "Navigate your vehicle with the arrow keys.", opacity: 0, y: canvas.height / 2 - 20 },
-        { text: "Produce radars by clicking your controls at the top, you've been delegated 3 sonar blasts.", opacity: 0, y: canvas.height / 2 + 20 },
-        { text: "Look for the exit, it will ping green, the walls white.", opacity: 0, y: canvas.height / 2 + 60  },
-        { text: "Start your sonar at the top right to begin.", opacity: 0, y: canvas.height / 2 + 100 }
-    ];
-
-    function updateTextFadeIn() {
-        if (currentTextIndex < startupTexts.length) {
-            let text = startupTexts[currentTextIndex];
-            if (text.opacity < 1) {
-                text.opacity += 0.01; // Adjust for desired fade-in speed
-            } else {
-                currentTextIndex++; // Move to the next text after current is fully visible
-            }
-        }
-    }
-    
-    // THIS PART SUCKED
-    function drawStartupTexts() {
-    startupTexts.forEach(text => {
-        let xPosition = canvas.width / 2; // Center alignment starting position
-        ctx.textAlign = 'center';
-        ctx.font = '20px Verdana';
-
-        if (text.text.includes('green') || text.text.includes('white')) {
-            // Split the sentence to color words differently
-            let parts = text.text.split(/(green|white)/);
-            let accumulatedWidth = 0;
-
-            parts.forEach(part => {
-                ctx.fillStyle = `rgba(150, 150, 150, ${text.opacity})`; // Default light grey color
-                if (part === 'green') {
-                    ctx.fillStyle = `rgba(0, 255, 0, ${text.opacity})`; // Green color
-                } else if (part === 'white') {
-                    ctx.fillStyle = `rgba(255, 255, 255, ${text.opacity})`; // White color
-                }
-
-                // Calculate the width of the part and adjust position
-                let metrics = ctx.measureText(part);
-                let partWidth = metrics.width;
-                let partX = xPosition - ctx.measureText(text.text).width / 2 + accumulatedWidth + partWidth / 2;
-
-                ctx.fillText(part, partX, text.y);
-                accumulatedWidth += partWidth; // Accumulate width to adjust next part position
-            });
-        } else {
-            // If the text does not contain 'green' or 'white'
-            ctx.fillStyle = `rgba(150, 150, 150, ${text.opacity})`; // Light grey color
-            ctx.fillText(text.text, xPosition, text.y);
-        }
-    });
-}
 
     // Sounds (More to come)
     var soundBell = new Audio('Bell.mp3')
@@ -120,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const player = new Player(650, 380, 10, 10, 2, canvas, false);
     
     // Walls
-    const walls = [
+    const level1Walls = [
         { x: 500, y: 100, width: 100, height: 300 },
         { x: 750, y: 100, width: 150, height: 450 },
         { x: 0, y: 510, width: 600, height: 210 },
@@ -134,43 +49,96 @@ document.addEventListener("DOMContentLoaded", function() {
         { x: 1400, y: 350, width: 300, height: 100},
     ];
 
+    const level2Walls = [
+        { x: 500, y: 100, width: 100, height: 300 },
+        { x: 750, y: 100, width: 150, height: 450 }
+    ];
+
     // Listen I know I know I should (probably) make a class for this stuff
     // but I will when I got more time alright leave me alone
     // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
+
+    const level2endPoint = { x: 400, y: 400, width: 50, height: 50 };
     const monster = {x: 650, y: 500, width: 50, height: 50}
     let endpointActive = false; // To check if the endpoint was activated
-    let endpointFadeTime = 0; // Counter for the fade effect
-    const endpointFadeDuration = 120; // Duration for the fade effect (in frames)
+
+    let startgameTexts = [
+        { text: "Navigate your vehicle with the arrow keys.", opacity: 0, y: canvas.height / 2 - 20 },
+        { text: "Produce radars by clicking your controls at the top, you've been delegated 3 sonar blasts.", opacity: 0, y: canvas.height / 2 + 20 },
+        { text: "Look for the exit, it will ping green, the walls white.", opacity: 0, y: canvas.height / 2 + 60  },
+        { text: "Start your sonar at the top right to begin.", opacity: 0, y: canvas.height / 2 + 100 }
+    ];
+
+    let level2Texts = [
+        { text: "If the radar blips red...", opacity: 0, y: canvas.height / 2 - 20 }
+    ]
+
+    // Level builders
+    const levels = [
+        new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx),
+        new Level(player, { x: 600, y: 380}, level2Walls, level2endPoint, level2Texts, canvas, ctx)
+    ]
+
+    let currentLevel = 0;
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, monster);
-    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, monster);
-    // const raycastAirhorn = new Raycast(canvas, player, walls, endPoint, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
+    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, monster);
+    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, monster);
+    const raycastNone = { // instance of 'none selected'
+        visibility: false,
+        triggerPing: function() {}, // No operation functions to replace the class ones
+        expandRays: function() {},
+        castRays: function() {},
+        drawRays: function() {},
+      };
 
     // Array of sound types
-    const soundTypes = [raycastBell, raycastRadar];
-    let currentType = 0; // Start with the first type (raycastBell)
+    const soundTypes = [raycastBell, raycastRadar, raycastNone];
+    let currentType = 2; // Start with the first type (raycastNone)
 
     // Sound select buttons (assuming we add more in the html)
     document.getElementById('buttonContainer').addEventListener('click', function(event) {
         const typeIndex = event.target.getAttribute('data-type');
         if (typeIndex !== null) {
-            if (!endpointActive) { // Fade the endpoint away
-                endpointActive = true;
-                endpointFadeTime = 0;
-            }
-            textFadeInStarted = true; // Hide the intro text
             let newIndex = parseInt(typeIndex, 10); // Convert the data-type value to an integer
+
+            if (newIndex !== 2) {
+                levels[currentLevel].textsShown = true;  // Hide texts once any active raycaster is selected
+            }
+
+            if (newIndex !== 2 && currentType === 2 && !levels[currentLevel].endpointFadeInitiated) {  // Check if changing from 'none'
+                levels[currentLevel].activateEndpoint(); // Activate endpoint showing
+            }
+
+            // Check if the radar is active and the radar button is clicked again
+            if (newIndex === 1) {
+                if (currentType === 1) {
+                    // Radar is already active, switching it off
+                    newIndex = 2; // Set to 'none' (assuming index 2 is raycastNone in your array)
+                    document.querySelector('#radarButton').style.backgroundImage = 'url("Radar_Echo_Button.png")';
+                } else {
+                    // Activating radar
+                    document.querySelector('#radarButton').style.backgroundImage = 'url("Radar_Echo_Button_Lit.png")';
+                }
+            } else if (currentType === 1) {
+                // Deactivating radar due to switching to another type
+                document.querySelector('#radarButton').style.backgroundImage = 'url("Radar_Echo_Button.png")';
+            }
+
+            // If raycastBell is selected and usage limit is reached, do nothing
             if (newIndex === 0 && raycastBellUsageCount >= maxRaycastBellUsage) {
-                // If raycastBell is selected and usage limit is reached, do nothing
                 return;
             }
+
             currentType = newIndex;
             soundTypes[currentType].triggerPing(); // Trigger the ping for the selected sound type
-            if (currentType === 0) { // Only count usages for raycastBell
+
+            // Only count usages for raycastBell
+            if (currentType === 0) { 
                 raycastBellUsageCount++;
             }
+
             updateButtonSelection(); // Call a function to update the button visuals
         }
     });
@@ -202,7 +170,34 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-    
+
+    function resetButtons() {
+    // Reset the raycastBell usage count and update its button
+    raycastBellUsageCount = 0;
+    const bellButton = document.querySelector('#bellButton'); // Corrected ID reference
+    if (bellButton) {
+        bellButton.style.backgroundImage = 'url("Bell_Echo_Button_0.png")';
+        bellButton.disabled = false;
+        bellButton.classList.remove('disabled');
+    }
+
+    // Reset the raycastRadar button to its default state
+    const radarButton = document.querySelector('#radarButton'); // Corrected ID reference
+    if (radarButton) {
+        radarButton.style.backgroundImage = 'url("Radar_Echo_Button.png")';
+    }
+
+    // Update all buttons to unselected
+    const buttons = document.querySelectorAll('#buttonContainer button');
+    buttons.forEach(button => {
+        button.classList.remove('selected');
+    });
+
+    // Optionally, set the first raycaster as selected or none if you want to start with a specific one
+    if (buttons.length > 0) {
+        buttons[0].classList.add('selected');
+    }
+}
 
     // Event listeners for keyups and keydowns (smoother movement)
     window.addEventListener('keydown', function(event) {
@@ -211,29 +206,13 @@ document.addEventListener("DOMContentLoaded", function() {
             case "ArrowDown":  player.activeDirections.down = true; break;
             case "ArrowLeft":  player.activeDirections.left = true; break;
             case "ArrowRight": player.activeDirections.right = true; break;
-            case '1': 
-                currentType = 0; // Switch to raycastBell
-                break;
-            case '2':
-                currentType = 1; // Switch to raycastRadar
-                break;
+            
+            // dev tools
             case 'r':
                 soundTypes[currentType].visibility = !soundTypes[currentType].visibility;
                 break;
-            case 's':
-                soundTypes[currentType].spinning = !soundTypes[currentType].spinning; // Toggle spinning on or off
-                break;
-            case 'c':
-                soundTypes[currentType].cone = !soundTypes[currentType].cone; // Toggle cone shape on or off
-                break; 
-            case 'e':
-                soundTypes[currentType].triggerPing();
-                break;
-            case 'a': 
-                soundTypes[currentType].cross = !soundTypes[currentType].cross;
-                break;
-            case 'b':
-                player.visibility = !player.visibility;
+            case 'n':
+                nextLevel();
                 break;
         }
     });
@@ -246,40 +225,36 @@ document.addEventListener("DOMContentLoaded", function() {
             case "ArrowRight": player.activeDirections.right = false; break;
         }
     });
-
-    function drawWalls() {
-        ctx.fillStyle = '#000'; // Fill outer wall
-        walls.forEach((wall) => {
-            // Draw the base wall
-            ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
-            ctx.strokeStyle = '#000';
-            ctx.strokeRect(wall.x, wall.y, wall.width, wall.height);
-        });
-    }
-
-    function drawEndPoint() {
-        let fadeFactor = endpointFadeTime / endpointFadeDuration;
-        if (endpointActive && endpointFadeTime < endpointFadeDuration) {
-            // Calculate color components based on the fade factor
-            let green = 200 * (1 - fadeFactor);
-            ctx.fillStyle = `rgb(0, ${green}, 0)`;
-            endpointFadeTime++; // Increment fade time
-        } else {
-            ctx.fillStyle = '#000'; // Set to black after fade is complete
+    
+    function checkLevelCompletion() {
+        if (
+            player.x < levels[currentLevel].endPoint.x + levels[currentLevel].endPoint.width &&
+            player.x + player.width > levels[currentLevel].endPoint.x &&
+            player.y < levels[currentLevel].endPoint.y + levels[currentLevel].endPoint.height &&
+            player.y + player.height > levels[currentLevel].endPoint.y
+        ) {
+            nextLevel();  // Use nextLevel function to handle level transition
         }
-        ctx.fillRect(endPoint.x, endPoint.y, endPoint.width, endPoint.height);
     }
     
-
-    function checkCollision() {
-        if (
-            player.x < endPoint.x + endPoint.width &&
-            player.x + player.width > endPoint.x &&
-            player.y < endPoint.y + endPoint.height &&
-            player.y + player.height > endPoint.y
-        ) {
-            congratulatePlayer();
+    function nextLevel() {
+        if (currentLevel < levels.length - 1) {
+            currentLevel++;
+            levels[currentLevel].activate();
+            resetButtons();
+            updateRaycasters();  // Update raycasters with new level walls
+            currentType = 2; // Reset raycaster to none
+        } else {
+            congratulatePlayer();  // End game logic if no more levels
         }
+    }
+
+    function updateRaycasters() {
+        // Update the walls and goal for each raycaster upon level transition
+        raycastBell.walls = levels[currentLevel].walls;
+        raycastRadar.walls = levels[currentLevel].walls;
+        raycastBell.endPoint = levels[currentLevel].endPoint;
+        raycastRadar.endPoint = levels[currentLevel].endPoint;
     }
 
     function checkCollision2() {
@@ -320,24 +295,24 @@ document.addEventListener("DOMContentLoaded", function() {
     function gameLoop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        player.update(walls);
-        drawWalls();
-        drawEndPoint();
+        player.update(levels[currentLevel].walls);
         player.draw(ctx);
 
-        if (!textFadeInStarted) { // Intro text
-            updateTextFadeIn();
-            drawStartupTexts();
+        if (levels[currentLevel]) {
+            levels[currentLevel].update();
+            levels[currentLevel].draw();
         }
 
         requestAnimationFrame(gameLoop);
         
         // Manage raycast expansions and drawing
-        if (soundTypes[currentType].pingActive) {
-            soundTypes[currentType].expandRays();
+        if (soundTypes[currentType] !== raycastNone) {
+            if (soundTypes[currentType].pingActive) {
+                soundTypes[currentType].expandRays();
+            }
+            soundTypes[currentType].castRays();
+            soundTypes[currentType].drawRays(ctx);
         }
-        soundTypes[currentType].castRays();
-        soundTypes[currentType].drawRays(ctx);
 
         // Special sound feature for Radar
         if (currentType === 1) { // Radar is selected
@@ -349,6 +324,7 @@ document.addEventListener("DOMContentLoaded", function() {
             soundRadar.currentTime = 0; // Optionally reset the playback position
         }
 
+        checkLevelCompletion();
         checkCollision();
         checkCollision2();
     }
