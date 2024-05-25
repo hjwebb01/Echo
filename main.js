@@ -58,10 +58,10 @@ document.addEventListener("DOMContentLoaded", function() {
     // but I will when I got more time alright leave me alone
     // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
-
     const level2endPoint = { x: 400, y: 400, width: 50, height: 50 };
+
+    // Monster stuff (to be continued)
     const monster = {x: 650, y: 500, width: 50, height: 50}
-    let endpointActive = false; // To check if the endpoint was activated
 
     let startgameTexts = [
         { text: "Navigate your vehicle with the arrow keys.", opacity: 0, y: canvas.height / 2 - 20 },
@@ -83,8 +83,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentLevel = 0;
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, monster);
-    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, monster);
+    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint);
+    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint);
     const raycastNone = { // instance of 'none selected'
         visibility: false,
         triggerPing: function() {}, // No operation functions to replace the class ones
@@ -325,7 +325,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         checkLevelCompletion();
-        checkCollision();
         checkCollision2();
     }
 
