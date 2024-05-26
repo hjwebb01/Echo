@@ -280,6 +280,17 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // collision detection for all monsters in the monster array
     function checkCollision() {
+        if (
+            player.x < endPoint.x + endPoint.width &&
+            player.x + player.width > endPoint.x &&
+            player.y < endPoint.y + endPoint.height &&
+            player.y + player.height > endPoint.y
+        ) {
+            congratulatePlayer();
+        }
+    }
+
+    function checkCollision2() {
         monster.forEach((monster) => {
             if (
                 player.x < monster.x + monster.width &&
@@ -290,17 +301,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 gameEnd();
             }
         });
-    }
-
-    function checkCollision2() {
-        if (
-            player.x < monster.x + monster.width &&
-            player.x + player.width > monster.x &&
-            player.y < monster.y + monster.height &&
-            player.y + player.height > monster.y
-        ) {
-            gameEnd();
-        }
     }
 
     function congratulatePlayer() {
