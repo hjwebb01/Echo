@@ -1,23 +1,21 @@
-// Import necessary modules if needed
+// starterMenu.js
 
-// Create a function to handle the Start button click event
-function startButtonClicked() {
-    // Redirect to main.js
-    window.location.href = 'main.js';
+// Create a function to handle the play button click event
+function handlePlayButtonClick() {
+    // Redirect to index.html
+    window.location.href = 'index.html';
 }
 
-// Create the menu HTML elements
-const menuContainer = document.createElement('div');
-menuContainer.classList.add('menu-container');
+// Create the menu page
+function createMenuPage() {
+    // Create the play button
+    const playButton = document.createElement('button');
+    playButton.textContent = 'Play';
+    playButton.addEventListener('click', handlePlayButtonClick);
 
-const headerText = document.createElement('h1');
-headerText.textContent = 'ECHO';
+    // Append the play button to the body
+    document.body.appendChild(playButton);
+}
 
-const startButton = document.createElement('button');
-startButton.textContent = 'Start';
-startButton.addEventListener('click', startButtonClicked);
-
-// Append the elements to the document body
-menuContainer.appendChild(headerText);
-menuContainer.appendChild(startButton);
-document.body.appendChild(menuContainer);
+// Call the createMenuPage function to generate the menu page
+createMenuPage();

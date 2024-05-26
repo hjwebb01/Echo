@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Radar-Maze Game</title>
 <style>
-
     body {
         margin: 0;
         overflow: hidden;
@@ -35,13 +34,29 @@
     };
 
     const maze = [
+        { x: 100, y: 100, width: 20, height: 200 },
         { x: 100, y: 100, width: 400, height: 20 },
-        { x: 100, y: 100, width: 20, height: 300 },
+        { x: 500, y: 100, width: 20, height: 300 },
         { x: 100, y: 380, width: 400, height: 20 },
-        { x: 480, y: 100, width: 20, height: 300 },
-        { x: 200, y: 200, width: 100, height: 20 },
-        { x: 300, y: 200, width: 100, height: 20 }
+        { x: 200, y: 200, width: 300, height: 20 },
+        // Additional maze walls
+        { x: 200, y: 100, width: 20, height: 100 },
+        { x: 300, y: 100, width: 20, height: 100 },
+        { x: 400, y: 200, width: 20, height: 180 },
+        { x: 200, y: 200, width: 180, height: 20 },
+        { x: 200, y: 300, width: 180, height: 20 },
+        { x: 200, y: 300, width: 20, height: 60 },
+        { x: 300, y: 300, width: 20, height: 60 },
+        // Goal area
+        { x: 540, y: 340, width: 40, height: 40 }
     ];
+
+    const goal = {
+        x: 540,
+        y: 340,
+        width: 40,
+        height: 40
+    };
 
     const radar = {
         x: 0,
@@ -53,13 +68,11 @@
     };
 
     function drawPlayer() {
-
         ctx.fillStyle = player.color;
         ctx.fillRect(player.x, player.y, player.width, player.height);
     }
 
     function drawMaze() {
-
         maze.forEach(wall => {
             if (radar.active && isWallInRadar(wall)) {
                 ctx.fillStyle = 'black';
@@ -70,15 +83,12 @@
         });
     }
 
-
     function isWallInRadar(wall) {
-
         const distance = Math.sqrt(Math.pow(radar.x - (wall.x + wall.width / 2), 2) + Math.pow(radar.y - (wall.y + wall.height / 2), 2));
         return distance <= radar.radius;
     }
 
     function drawRadar() {
-
         if (radar.active) {
             ctx.beginPath();
             ctx.arc(radar.x, radar.y, radar.radius, 0, Math.PI * 2);
@@ -88,26 +98,27 @@
         }
     }
 
-    function draw() {
+    function drawGoal() {
+        ctx.fillStyle = 'green';
+        ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+    }
 
+    function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawMaze();
         drawPlayer();
+        drawGoal();
         drawRadar();
     }
 
     function movePlayer(direction) {
         switch (direction) {
             case 'up':
-
                 player.y -= player.speed;
                 break;
-
             case 'down':
-
                 player.y += player.speed;
                 break;
-                
             case 'left':
                 player.x -= player.speed;
                 break;
@@ -118,11 +129,8 @@
     }
 
     function checkCollision() {
-
         let collision = false;
-
         maze.forEach(wall => {
-            
             if (
                 player.x < wall.x + wall.width &&
                 player.x + player.width > wall.x &&
@@ -132,8 +140,19 @@
                 collision = true;
             }
         });
-
         return collision;
+    }
+
+    function checkGoal() {
+        if (
+            player.x < goal.x + goal.width &&
+            player.x + player.width > goal.x &&
+            player.y < goal.y + goal.height &&
+            player.y + player.height > goal.y
+        ) {
+            return true;
+        }
+        return false;
     }
 
     window.addEventListener('keydown', function(event) {
@@ -154,6 +173,9 @@
         if (checkCollision()) {
             movePlayer(event.key.replace('Arrow', '').toLowerCase());
         }
+        if (checkGoal()) {
+            alert('Congratulations! You reached the goal!');
+        }
         draw();
     });
 
@@ -165,7 +187,6 @@
     });
 
     function animateRadarExpansion() {
-
         const animationSpeed = 3;
         const expansionInterval = setInterval(() => {
             if (radar.radius < radar.maxRadius) {
@@ -179,13 +200,10 @@
     }
 
     function animateRadarContraction() {
-
         const contractionInterval = setInterval(() => {
             if (radar.radius > 0) {
                 radar.radius--;
                 draw();
-                
-
             } else {
                 clearInterval(contractionInterval);
                 radar.active = false;
@@ -196,9 +214,6 @@
     }
 
     draw();
-
-
-
 </script>
 </body>
 </html>
