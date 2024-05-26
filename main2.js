@@ -138,7 +138,15 @@ document.addEventListener("DOMContentLoaded", function() {
     // but I will when I got more time alright leave me alone
     // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
-    const monster = [{x: 650, y: 500, width: 50, height: 50}];
+    // add more monsters
+    const monster = [{x: 650, y: 500, width: 50, height: 50},
+        {x: 1000, y: 200, width: 50, height: 50},
+        {x: 100, y: 300, width: 50, height: 50},
+        {x: 1300, y: 500, width: 50, height: 50},
+        {x: 100, y: 500, width: 50, height: 50},
+        {x: 100, y: 500, width: 50, height: 50},
+    ];
+    
     let endpointActive = false; // To check if the endpoint was activated
     let endpointFadeTime = 0; // Counter for the fade effect
     const endpointFadeDuration = 120; // Duration for the fade effect (in frames)
@@ -270,16 +278,18 @@ document.addEventListener("DOMContentLoaded", function() {
         ctx.fillRect(endPoint.x, endPoint.y, endPoint.width, endPoint.height);
     }
     
-
+    // collision detection for all monsters in the monster array
     function checkCollision() {
-        if (
-            player.x < endPoint.x + endPoint.width &&
-            player.x + player.width > endPoint.x &&
-            player.y < endPoint.y + endPoint.height &&
-            player.y + player.height > endPoint.y
-        ) {
-            congratulatePlayer();
-        }
+        monster.forEach((monster) => {
+            if (
+                player.x < monster.x + monster.width &&
+                player.x + player.width > monster.x &&
+                player.y < monster.y + monster.height &&
+                player.y + player.height > monster.y
+            ) {
+                gameEnd();
+            }
+        });
     }
 
     function checkCollision2() {
