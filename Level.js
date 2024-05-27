@@ -1,5 +1,5 @@
 export class Level {
-    constructor(player, playerStartPosition, walls, endPoint, startupTexts, canvas, ctx) {
+    constructor(player, playerStartPosition, walls, endPoint, startupTexts, canvas, ctx, monsters) {
         this.player = player;
         this.playerStartPosition = playerStartPosition;
         this.walls = walls;
@@ -13,6 +13,7 @@ export class Level {
         this.endpointFadeTime = 0;
         this.endpointFadeDuration = 120;
         this.endpointFadeInitiated = false;
+        this.monsters = monsters;
     }
 
     activate() {

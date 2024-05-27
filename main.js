@@ -68,6 +68,8 @@ document.addEventListener("DOMContentLoaded", function() {
         {x: 100, y: 500, width: 50, height: 50},
         {x: 100, y: 500, width: 50, height: 50},
     ];
+    const monsterslvl2 = [
+    ];
 
     let endpointActive = false; // To check if the endpoint was activated
 
@@ -84,15 +86,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Level builders
     const levels = [
-        new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx),
-        new Level(player, { x: 600, y: 380}, level2Walls, level2endPoint, level2Texts, canvas, ctx)
+        new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx, monsters),
+        new Level(player, { x: 600, y: 380}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2)
     ]
 
     let currentLevel = 0;
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, monsters);
-    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, monsters);
+    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, levels[currentLevel].monsters);
+    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, levels[currentLevel].monsters);
     const raycastNone = { // instance of 'none selected'
         visibility: false,
         triggerPing: function() {}, // No operation functions to replace the class ones
@@ -263,12 +265,39 @@ document.addEventListener("DOMContentLoaded", function() {
         raycastRadar.walls = levels[currentLevel].walls;
         raycastBell.endPoint = levels[currentLevel].endPoint;
         raycastRadar.endPoint = levels[currentLevel].endPoint;
+        raycastBell.monsters = levels[currentLevel].monsters;
+        raycastRadar.monsters = levels[currentLevel].monsters;
     }
 
     function congratulatePlayer() {
         // Display a congratulatory message
         const congratsMessage = document.createElement('h1');
         congratsMessage.textContent = 'Congratulations!';
+        congratsMessage.style.color = '#fff';
+        congratsMessage.style.position = 'absolute';
+        congratsMessage.style.top = '50%';
+        congratsMessage.style.left = '50%';
+        congratsMessage.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(congratsMessage);
+    }
+
+    function checkMonsterCollision() {
+        levels[currentLevel].monsters.forEach((monsters) => {
+            if (
+                player.x < monsters.x + monsters.width &&
+                player.x + player.width > monsters.x &&
+                player.y < monsters.y + monsters.height &&
+                player.y + player.height > monsters.y
+            ) {
+                gameEnd();
+            }
+        });
+    }
+
+    function gameEnd() {
+        // Death logic
+        const congratsMessage = document.createElement('h1');
+        congratsMessage.textContent = 'You touched a monster!';
         congratsMessage.style.color = '#fff';
         congratsMessage.style.position = 'absolute';
         congratsMessage.style.top = '50%';
@@ -310,6 +339,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         checkLevelCompletion();
+        checkMonsterCollision();
     }
 
     gameLoop();
