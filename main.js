@@ -2,6 +2,7 @@
 import { Player } from './Player.js';
 import { Raycast } from './Raycast.js';
 import { Level } from './Level.js';
+import { Monster } from './Monster.js';
 
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
@@ -61,13 +62,15 @@ document.addEventListener("DOMContentLoaded", function() {
     const level2endPoint = { x: 400, y: 400, width: 50, height: 50 };
 
     // Monsters
-    const monsters = [{x: 650, y: 500, width: 50, height: 50},
-        {x: 1000, y: 200, width: 50, height: 50},
-        {x: 100, y: 300, width: 50, height: 50},
-        {x: 1300, y: 500, width: 50, height: 50},
-        {x: 100, y: 500, width: 50, height: 50},
-        {x: 100, y: 500, width: 50, height: 50},
+    const monsters = [
+        new Monster(650, 500, 50, 50, false, 0),
+        new Monster(1000, 200, 50, 50, false, 0),
+        new Monster(100, 300, 50, 50, false, 0),
+        new Monster(1300, 500, 50, 50, false, 0),
+        new Monster(100, 500, 50, 50, false, 0),
+        new Monster(100, 500, 50, 50, false, 0)
     ];
+    
     const monsterslvl2 = [
     ];
 
@@ -94,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Raycaster instances
     const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, levels[currentLevel].monsters);
-    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, levels[currentLevel].monsters);
+    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 400, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, levels[currentLevel].monsters);
     const raycastNone = { // instance of 'none selected'
         visibility: false,
         triggerPing: function() {}, // No operation functions to replace the class ones
@@ -282,13 +285,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function checkMonsterCollision() {
-        levels[currentLevel].monsters.forEach((monsters) => {
-            if (
-                player.x < monsters.x + monsters.width &&
-                player.x + player.width > monsters.x &&
-                player.y < monsters.y + monsters.height &&
-                player.y + player.height > monsters.y
-            ) {
+        levels[currentLevel].monsters.forEach(monster => {
+            if (monster.checkCollision(player)) {
                 gameEnd();
             }
         });
@@ -317,6 +315,14 @@ document.addEventListener("DOMContentLoaded", function() {
             levels[currentLevel].draw();
         }
 
+        // Monster current level update
+        levels[currentLevel].monsters.forEach(monster => {
+            monster.update();
+            if (monster.checkCollision(player)) {
+                gameEnd();
+            }
+        });
+
         requestAnimationFrame(gameLoop);
         
         // Manage raycast expansions and drawing
@@ -339,7 +345,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         checkLevelCompletion();
-        checkMonsterCollision();
     }
 
     gameLoop();
