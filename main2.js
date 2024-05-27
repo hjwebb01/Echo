@@ -318,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function gameEnd() {
         // Display a congratulatory message
         const congratsMessage = document.createElement('h1');
-        congratsMessage.textContent = 'You tocuhed a monster!';
+        congratsMessage.textContent = 'You touched a monster!';
         congratsMessage.style.color = '#fff';
         congratsMessage.style.position = 'absolute';
         congratsMessage.style.top = '50%';
