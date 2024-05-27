@@ -58,15 +58,48 @@ document.addEventListener("DOMContentLoaded", function() {
     // but I will when I got more time alright leave me alone
     // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
-    const monster = {x: 650, y: 500, width: 50, height: 50};
+    const level2endPoint = { x: 400, y: 400, width: 50, height: 50 };
+
+    // Monsters
+    const monsters = [{x: 650, y: 500, width: 50, height: 50},
+        {x: 1000, y: 200, width: 50, height: 50},
+        {x: 100, y: 300, width: 50, height: 50},
+        {x: 1300, y: 500, width: 50, height: 50},
+        {x: 100, y: 500, width: 50, height: 50},
+        {x: 100, y: 500, width: 50, height: 50},
+    ];
+
     let endpointActive = false; // To check if the endpoint was activated
-    let endpointFadeTime = 0; // Counter for the fade effect
-    const endpointFadeDuration = 120; // Duration for the fade effect (in frames)
+
+    let startgameTexts = [
+        { text: "Navigate your vehicle with the arrow keys.", opacity: 0, y: canvas.height / 2 - 20 },
+        { text: "Produce radars by clicking your controls at the top, you've been delegated 3 sonar blasts.", opacity: 0, y: canvas.height / 2 + 20 },
+        { text: "Look for the exit, it will ping green, the walls white.", opacity: 0, y: canvas.height / 2 + 60  },
+        { text: "Start your sonar at the top right to begin.", opacity: 0, y: canvas.height / 2 + 100 }
+    ];
+
+    let level2Texts = [
+        { text: "If the radar blips red...", opacity: 0, y: canvas.height / 2 - 20 }
+    ]
+
+    // Level builders
+    const levels = [
+        new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx),
+        new Level(player, { x: 600, y: 380}, level2Walls, level2endPoint, level2Texts, canvas, ctx)
+    ]
+
+    let currentLevel = 0;
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, monster);
-    const raycastRadar = new Raycast(canvas, player, walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, monster);
-    // const raycastAirhorn = new Raycast(canvas, player, walls, endPoint, 360, 12, 500, 90, false, false, false, playAirhorn, true, 600)
+    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, monsters);
+    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 150, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, monsters);
+    const raycastNone = { // instance of 'none selected'
+        visibility: false,
+        triggerPing: function() {}, // No operation functions to replace the class ones
+        expandRays: function() {},
+        castRays: function() {},
+        drawRays: function() {},
+      };
 
     // Array of sound types
     const soundTypes = [raycastBell, raycastRadar, raycastNone];
@@ -232,33 +265,10 @@ document.addEventListener("DOMContentLoaded", function() {
         raycastRadar.endPoint = levels[currentLevel].endPoint;
     }
 
-    function checkCollision2() {
-        if (
-            player.x < monster.x + monster.width &&
-            player.x + player.width > monster.x &&
-            player.y < monster.y + monster.height &&
-            player.y + player.height > monster.y
-        ) {
-            gameEnd();
-        }
-    }
-
     function congratulatePlayer() {
         // Display a congratulatory message
         const congratsMessage = document.createElement('h1');
         congratsMessage.textContent = 'Congratulations!';
-        congratsMessage.style.color = '#fff';
-        congratsMessage.style.position = 'absolute';
-        congratsMessage.style.top = '50%';
-        congratsMessage.style.left = '50%';
-        congratsMessage.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(congratsMessage);
-    }
-
-    function gameEnd() {
-        // Display a congratulatory message
-        const congratsMessage = document.createElement('h1');
-        congratsMessage.textContent = 'You tocuhed a monster!';
         congratsMessage.style.color = '#fff';
         congratsMessage.style.position = 'absolute';
         congratsMessage.style.top = '50%';
@@ -300,7 +310,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         checkLevelCompletion();
-        checkCollision2();
     }
 
     gameLoop();
