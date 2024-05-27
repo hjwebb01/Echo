@@ -116,6 +116,11 @@ document.addEventListener("DOMContentLoaded", function() {
         soundAirhorn.play();
     }
 
+    var monster = new Audio('Airhorn.mp3')
+    function playAirhorn() {
+        soundAirhorn.play();
+    }
+
     // Player
     const player = new Player(650, 380, 10, 10, 2, canvas, false);
     
