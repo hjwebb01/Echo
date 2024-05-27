@@ -319,6 +319,8 @@ document.addEventListener("DOMContentLoaded", function() {
         // Display a congratulatory message
         const congratsMessage = document.createElement('h1');
         congratsMessage.textContent = 'You touched a monster!';
+        //play airhorn.mp3 song
+        soundAirhorn.play();
         congratsMessage.style.color = '#fff';
         congratsMessage.style.position = 'absolute';
         congratsMessage.style.top = '50%';
