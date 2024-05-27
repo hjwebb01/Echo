@@ -117,8 +117,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     var monster = new Audio('Airhorn.mp3')
-    function playAirhorn() {
-        soundAirhorn.play();
+    function playMonster() {
+        monster.play();
     }
 
     // Player
@@ -325,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const congratsMessage = document.createElement('h1');
         congratsMessage.textContent = 'You touched a monster!';
         //play airhorn.mp3 song
-        soundAirhorn.play();
+        playMonster.play();
         congratsMessage.style.color = '#fff';
         congratsMessage.style.position = 'absolute';
         congratsMessage.style.top = '50%';
