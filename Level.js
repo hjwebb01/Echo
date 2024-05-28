@@ -111,7 +111,7 @@ export class Level {
         this.ctx.font = '20px Verdana';
     
         // Split the sentence to color words "green", "white", and "red" differently
-        let parts = text.text.split(/(green|white|red)/);
+        let parts = text.text.split(/(green|white|red|THEY)/);
         let accumulatedWidth = 0;
     
         parts.forEach(part => {
@@ -121,7 +121,7 @@ export class Level {
                 this.ctx.fillStyle = `rgba(0, 255, 0, ${text.opacity})`; // Green color
             } else if (part === 'white') {
                 this.ctx.fillStyle = `rgba(255, 255, 255, ${text.opacity})`; // White color
-            } else if (part === 'red') {
+            } else if (part === 'red' || part === 'THEY') {
                 this.ctx.fillStyle = `rgba(255, 0, 0, ${text.opacity})`; // Red color
             }
     

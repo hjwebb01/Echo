@@ -6,12 +6,18 @@ export class Monster {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.isMoving = isMoving;
+        this.isMovingInitially = isMoving;
+        this.isMoving = false;  // Start as false, enable later
         this.moveSpeed = moveSpeed;
         this.player = player;
     }
 
-    update() {
+    update(endpointActive) {
+        // Only allow movement if textsShown is false
+        if (this.isMovingInitially && endpointActive) {
+            this.isMoving = true;
+        }
+
         if (this.isMoving) {
             this.moveTowardPlayer();
         }
