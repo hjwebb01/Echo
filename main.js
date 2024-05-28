@@ -28,9 +28,9 @@ document.addEventListener("DOMContentLoaded", function() {
         soundRadar.play();
     }
 
-    var soundAirhorn = new Audio('Airhorn.mp3')
-    function playAirhorn() {
-        soundAirhorn.play();
+    var monster = new Audio('monster_scream.wav')
+    function playMonster() {
+        monster.play();
     }
 
     // Player
@@ -59,6 +59,10 @@ document.addEventListener("DOMContentLoaded", function() {
         new Wall(1400, 0, 100, 360, player, canvas, true, 40, 1),
         new Wall(1400, 360, 100, 360, player, canvas, true, 40, 1)
     ];
+
+    const level3Walls = [
+
+    ];
     
 
     // Listen I know I know I should (probably) make a class for this stuff
@@ -66,18 +70,25 @@ document.addEventListener("DOMContentLoaded", function() {
     // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
     const level2endPoint = { x: 1600, y: 600, width: 50, height: 50 };
+    const level3endPoint = { x: 1600, y: 100, width: 50, height: 50 };
 
     // Monsters
     const monsters = [
-        new Monster(650, 500, 50, 50, false, 0),
-        new Monster(1000, 200, 50, 50, false, 0),
-        new Monster(100, 300, 50, 50, false, 0),
-        new Monster(1300, 500, 50, 50, false, 0),
-        new Monster(100, 500, 50, 50, false, 0),
-        new Monster(100, 500, 50, 50, false, 0)
+        new Monster(650, 500, 50, 50, false, 0, player),
+        new Monster(1000, 200, 50, 50, false, 0, player),
+        new Monster(100, 300, 50, 50, false, 0, player),
+        new Monster(1300, 500, 50, 50, false, 0, player),
+        new Monster(100, 500, 50, 50, false, 0, player),
+        new Monster(100, 500, 50, 50, false, 0, player)
     ];
     
     const monsterslvl2 = [
+    ];
+
+    const monsterslvl3 = [
+        new Monster(1700, 50, 50, 50, true, 1, player),
+        new Monster(700, 500, 50, 50, false, 0, player),
+        new Monster(1000, 520, 50, 50, false, 0, player),
     ];
 
     let startgameTexts = [
@@ -91,10 +102,15 @@ document.addEventListener("DOMContentLoaded", function() {
         { text: "Trust your surroundings, ride the edges.", opacity: 0, y: canvas.height / 2 - 20 }
     ]
 
+    let level3Texts = [
+        { text: "Threats that blip red are always stationary.", opacity: 0, y: canvas.height / 2 - 20 }
+    ]
+
     // Level builders
     const levels = [
         new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx, monsters),
-        new Level(player, { x: 50, y: 50}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2)
+        new Level(player, { x: 50, y: 50}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2),
+        new Level(player, { x: 500, y: 400}, level3Walls, level3endPoint, level3Texts, canvas, ctx, monsterslvl3)
     ]
 
     let currentLevel = 0;
@@ -290,14 +306,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function gameEnd() {
         // Death logic
-        const congratsMessage = document.createElement('h1');
+        playMonster();
+        levels[currentLevel].monsters.forEach(monster => {
+            monster.resetPosition(); // Reset each monster's position
+        });
+        levels[currentLevel].activate();
+        resetButtons();
+        updateRaycasters();
+        currentType = 2;
+        /* const congratsMessage = document.createElement('h1');
         congratsMessage.textContent = 'You touched a monster!';
         congratsMessage.style.color = '#fff';
         congratsMessage.style.position = 'absolute';
         congratsMessage.style.top = '50%';
         congratsMessage.style.left = '50%';
         congratsMessage.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(congratsMessage);
+        document.body.appendChild(congratsMessage); */
     }
 
     function gameLoop(timestamp) {
