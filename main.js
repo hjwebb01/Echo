@@ -3,6 +3,7 @@ import { Player } from './Player.js';
 import { Raycast } from './Raycast.js';
 import { Level } from './Level.js';
 import { Monster } from './Monster.js';
+import { Wall } from './Wall.js';
 
 document.addEventListener("DOMContentLoaded", function() {
     const canvas = document.getElementById('gameCanvas');
@@ -12,8 +13,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let raycastBellUsageCount = 0;
     const maxRaycastBellUsage = 3;
 
-    // Better intro text stuff
-    let textFadeInStarted = false;
+    // Timer for random events
+    let lastFrameTimeMs = 0; // Track the last frame time
 
     // Sounds (More to come)
     var soundBell = new Audio('Bell.mp3')
@@ -37,29 +38,34 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Walls
     const level1Walls = [
-        { x: 500, y: 100, width: 100, height: 300 },
-        { x: 750, y: 100, width: 150, height: 450 },
-        { x: 0, y: 510, width: 600, height: 210 },
-        { x: 700, y: 180, width: 300, height: 100},
-        { x: 1100, y: 100, width: 100, height: 515 },
-        { x: 600, y: 510, width: 300, height: 105},
-        { x: 500, y: 100, width: 600, height: 0 },
-        { x: 100, y: 180, width: 400, height: 100},
-        { x: 1300, y: 100, width: 100, height: 515 },
-        { x: 1200, y: 615, width: 100, height: 0 },
-        { x: 1400, y: 350, width: 300, height: 100},
+        new Wall(500, 100, 100, 300, player, canvas, false, 10, 1),
+        new Wall(750, 100, 150, 450, player, canvas, false, 20, 1),
+        new Wall(0, 510, 600, 210, player, canvas, false, 20, 1),
+        new Wall(700, 180, 300, 100, player, canvas, false, 20, 1),
+        new Wall(1100, 100, 100, 515, player, canvas, false, 20, 1),
+        new Wall(600, 510, 300, 105, player, canvas, false, 20, 1),
+        new Wall(500, 100, 600, 0, player, canvas, false, 20, 1),
+        new Wall(100, 180, 400, 100, player, canvas, false, 20, 1),
+        new Wall(1300, 100, 100, 515, player, canvas, true, 20, 1),
+        new Wall(1200, 615, 100, 0, player, canvas, true, 20, 1),
+        new Wall(1400, 350, 300, 100, player, canvas, true, 20, 1)
     ];
-
+    
     const level2Walls = [
-        { x: 500, y: 100, width: 100, height: 300 },
-        { x: 750, y: 100, width: 150, height: 450 }
+        new Wall(220, 0, 100, 360, player, canvas, true, 40, 1),
+        new Wall(220, 360, 100, 360, player, canvas, true, 40, 1),
+        new Wall(750, 0, 100, 360, player, canvas, true, 40, 1),
+        new Wall(750, 360, 100, 360, player, canvas, true, 40, 1),
+        new Wall(1400, 0, 100, 360, player, canvas, true, 40, 1),
+        new Wall(1400, 360, 100, 360, player, canvas, true, 40, 1)
     ];
+    
 
     // Listen I know I know I should (probably) make a class for this stuff
     // but I will when I got more time alright leave me alone
     // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
-    const level2endPoint = { x: 400, y: 400, width: 50, height: 50 };
+    const level2endPoint = { x: 1600, y: 600, width: 50, height: 50 };
 
     // Monsters
     const monsters = [
@@ -74,37 +80,35 @@ document.addEventListener("DOMContentLoaded", function() {
     const monsterslvl2 = [
     ];
 
-    let endpointActive = false; // To check if the endpoint was activated
-
     let startgameTexts = [
         { text: "Navigate your vehicle with the arrow keys.", opacity: 0, y: canvas.height / 2 - 20 },
         { text: "Produce radars by clicking your controls at the top, you've been delegated 3 sonar blasts.", opacity: 0, y: canvas.height / 2 + 20 },
-        { text: "Look for the exit, it will ping green, the walls white.", opacity: 0, y: canvas.height / 2 + 60  },
+        { text: "Look for the exit, it will ping green, the walls white, threats red.", opacity: 0, y: canvas.height / 2 + 60  },
         { text: "Start your sonar at the top right to begin.", opacity: 0, y: canvas.height / 2 + 100 }
     ];
 
     let level2Texts = [
-        { text: "If the radar blips red...", opacity: 0, y: canvas.height / 2 - 20 }
+        { text: "Trust your surroundings, ride the edges.", opacity: 0, y: canvas.height / 2 - 20 }
     ]
 
     // Level builders
     const levels = [
         new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx, monsters),
-        new Level(player, { x: 600, y: 380}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2)
+        new Level(player, { x: 50, y: 50}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2)
     ]
 
     let currentLevel = 0;
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 12, 400, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, levels[currentLevel].monsters);
-    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 400, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, levels[currentLevel].monsters);
+    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 18, 700, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, levels[currentLevel].monsters);
+    const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 300, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, levels[currentLevel].monsters);
     const raycastNone = { // instance of 'none selected'
         visibility: false,
         triggerPing: function() {}, // No operation functions to replace the class ones
         expandRays: function() {},
         castRays: function() {},
         drawRays: function() {},
-      };
+    };
 
     // Array of sound types
     const soundTypes = [raycastBell, raycastRadar, raycastNone];
@@ -284,14 +288,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.body.appendChild(congratsMessage);
     }
 
-    function checkMonsterCollision() {
-        levels[currentLevel].monsters.forEach(monster => {
-            if (monster.checkCollision(player)) {
-                gameEnd();
-            }
-        });
-    }
-
     function gameEnd() {
         // Death logic
         const congratsMessage = document.createElement('h1');
@@ -304,14 +300,17 @@ document.addEventListener("DOMContentLoaded", function() {
         document.body.appendChild(congratsMessage);
     }
 
-    function gameLoop() {
+    function gameLoop(timestamp) {
+        const deltaTime = timestamp - lastFrameTimeMs; // Calculate delta time
+        lastFrameTimeMs = timestamp; // Update last frame time
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         player.update(levels[currentLevel].walls);
         player.draw(ctx);
 
         if (levels[currentLevel]) {
-            levels[currentLevel].update();
+            levels[currentLevel].update(deltaTime);
             levels[currentLevel].draw();
         }
 
@@ -347,5 +346,6 @@ document.addEventListener("DOMContentLoaded", function() {
         checkLevelCompletion();
     }
 
-    gameLoop();
+    requestAnimationFrame(gameLoop);
+    //gameLoop();
 });

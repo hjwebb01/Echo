@@ -26,11 +26,12 @@ export class Level {
         this.startupTexts.forEach(text => text.opacity = 0); // Reset opacity on activate
     }
 
-    update() {
+    update(deltaTime) {
         if (!this.textsShown) {
             this.updateTextFadeIn();
         }
         this.updateEndpointFade();
+        this.updateWalls(deltaTime); // Update the walls with the delta time
     }
 
     draw() {
@@ -87,6 +88,12 @@ export class Level {
             this.endpointActive = true;
             this.endpointFadeTime = 0;
         }
+    }
+
+    updateWalls(deltaTime) {
+        this.walls.forEach(wall => {
+            wall.update(deltaTime); // Make sure each wall has an update method
+        });
     }
 
     drawWalls() {
