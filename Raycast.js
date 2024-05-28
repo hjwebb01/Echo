@@ -25,6 +25,7 @@ export class Raycast {
     }
 
     castRays() {
+        this.walls.forEach(wall => wall.setHitByRay(false)); // Reset hit status before casting
         this.rays = []; // Clear previous rays
         const angleIncrement = Math.PI * 2 / this.rayAmount;
         const playerCenterX = this.player.x + this.player.width / 2;
@@ -105,9 +106,13 @@ export class Raycast {
     rayHits(rayX, rayY) {
         // Check collision with walls
         const hitsWall = this.walls.some(wall => {
-            return (rayX >= wall.x && rayX <= wall.x + wall.width &&
-                rayY >= wall.y && rayY <= wall.y + wall.height);
-        });
+            const hit = rayX >= wall.x && rayX <= wall.x + wall.width &&
+                        rayY >= wall.y && rayY <= wall.y + wall.height;
+            if (hit) {
+                wall.setHitByRay(true); // Set the wall as being hit by a ray
+            }
+            return hit;
+        });    
 
         // Check collision with endPoint
         const hitsEndPoint = rayX >= this.endPoint.x && rayX <= this.endPoint.x + this.endPoint.width &&

@@ -11,10 +11,11 @@ export class Wall {
         this.moveChance = moveChance;
         this.moveTimer = 0;
         this.moveInterval = 2000; // Movement check every 2000 milliseconds (2 seconds)
+        this.isHitByRay = false; // don't move if currently lighting up
     }
 
     update(deltaTime) {
-        if (this.isMoving) {
+        if (this.isMoving && !this.isHitByRay) {
             this.moveTimer += deltaTime;
             if (this.moveTimer >= this.moveInterval) {
                 this.moveTimer = 0; // Reset timer
@@ -26,6 +27,11 @@ export class Wall {
     }
 
     attemptMove() {
+        if (this.isHitByRay) {
+            return; // Skip the move attempt if the wall is currently hit by a ray
+        }
+    
+        // Existing movement logic
         const directions = [
             { dx: 0, dy: -this.moveDistance }, // Up
             { dx: this.moveDistance, dy: 0 }, // Right
@@ -33,17 +39,18 @@ export class Wall {
             { dx: -this.moveDistance, dy: 0 } // Left
         ];
         const direction = directions[Math.floor(Math.random() * directions.length)];
-
+    
         // Calculate new position
         const newX = this.x + direction.dx;
         const newY = this.y + direction.dy;
-
+    
         // Check for collision with player and boundary
         if (!this.collidesWithPlayer(newX, newY) && this.isWithinBounds(newX, newY)) {
             this.x = newX;
             this.y = newY;
         }
     }
+    
 
     collidesWithPlayer(newX, newY) {
         // Check if the new position of the wall intersects with the player's position
@@ -65,4 +72,8 @@ export class Wall {
         );
     }
 
+    setHitByRay(hitStatus) {
+        // Set the hit by ray status
+        this.isHitByRay = hitStatus;
+    }
 }

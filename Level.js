@@ -110,16 +110,19 @@ export class Level {
         this.ctx.textAlign = 'center';
         this.ctx.font = '20px Verdana';
     
-        // Split the sentence to color words differently
-        let parts = text.text.split(/(green|white)/);
+        // Split the sentence to color words "green", "white", and "red" differently
+        let parts = text.text.split(/(green|white|red)/);
         let accumulatedWidth = 0;
     
         parts.forEach(part => {
-            this.ctx.fillStyle = `rgba(150, 150, 150, ${text.opacity})`; // Default light grey color
+            // Default light grey color
+            this.ctx.fillStyle = `rgba(150, 150, 150, ${text.opacity})`;
             if (part === 'green') {
                 this.ctx.fillStyle = `rgba(0, 255, 0, ${text.opacity})`; // Green color
             } else if (part === 'white') {
                 this.ctx.fillStyle = `rgba(255, 255, 255, ${text.opacity})`; // White color
+            } else if (part === 'red') {
+                this.ctx.fillStyle = `rgba(255, 0, 0, ${text.opacity})`; // Red color
             }
     
             // Calculate the width of the part and adjust position
@@ -131,4 +134,5 @@ export class Level {
             accumulatedWidth += partWidth; // Accumulate width to adjust next part position
         });
     }
+    
 }
