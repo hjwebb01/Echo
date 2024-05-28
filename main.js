@@ -61,8 +61,35 @@ document.addEventListener("DOMContentLoaded", function() {
     ];
 
     const level3Walls = [
-
+        new Wall(500, 400, 10, 150, player, canvas, false, 0, 0),
+        new Wall(500, 550, 300, 10, player, canvas, false, 0, 0),
+        new Wall(800, 400, 10, 160, player, canvas, false, 0, 0), 
+        new Wall(800, 400, 200, 10, player, canvas, false, 0, 0), 
+        new Wall(1000, 400, 10, 320, player, canvas, false, 0, 0),
+        new Wall(700, 720, 300, 10, player, canvas, false, 0, 0),
+        new Wall(700, 620, 10, 100, player, canvas, false, 0, 0),
+        new Wall(500, 620, 210, 10, player, canvas, false, 0, 0),
+        new Wall(500, 520, 10, 100, player, canvas, false, 0, 0),
+        new Wall(300, 520, 200, 10, player, canvas, false, 0, 0),
+        new Wall(300, 100, 10, 420, player, canvas, false, 0, 0),
+        new Wall(300, 100, 1300, 10, player, canvas, false, 0, 0),
+        new Wall(1600, 100, 10, 400, player, canvas, false, 0, 0),
+        new Wall(1400, 500, 200, 10, player, canvas, false, 0, 0) 
     ];
+    
+    const level4Walls = [
+        new Wall(0, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(178, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(356, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(534, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(712, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(890, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1068, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1246, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1424, 300, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1602, 300, 178, 60, player, canvas, true, 100, 0.5)
+    ];
+    
     
 
     // Listen I know I know I should (probably) make a class for this stuff
@@ -70,7 +97,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // End point stuff 
     const endPoint = { x: 950, y: 400, width: 50, height: 50 };
     const level2endPoint = { x: 1600, y: 600, width: 50, height: 50 };
-    const level3endPoint = { x: 1600, y: 100, width: 50, height: 50 };
+    const level3endPoint = { x: 400, y: 650, width: 50, height: 50 };
+    const level4endPoint = { x: 850, y: 100, width: 50, height: 50 };
 
     // Monsters
     const monsters = [
@@ -87,8 +115,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const monsterslvl3 = [
         new Monster(1700, 50, 50, 50, true, 1, player),
-        new Monster(700, 500, 50, 50, false, 0, player),
-        new Monster(1000, 520, 50, 50, false, 0, player),
+        new Monster(700, 380, 50, 50, false, 0, player),
+        new Monster(1100, 520, 50, 50, false, 0, player),
+    ];
+
+    const monsterslvl4 = [
+        new Monster(1700, 50, 50, 50, true, 1, player),
+        new Monster(20, 50, 50, 50, true, 1, player),
     ];
 
     let startgameTexts = [
@@ -106,11 +139,16 @@ document.addEventListener("DOMContentLoaded", function() {
         { text: "Threats that blip red are always stationary.", opacity: 0, y: canvas.height / 2 - 20 }
     ]
 
+    let level4Texts = [
+        { text: "THEY CAN GO THROUGH WALLS.", opacity: 0, y: canvas.height / 2 - 20 }
+    ]
+
     // Level builders
     const levels = [
         new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx, monsters),
-        new Level(player, { x: 50, y: 50}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2),
-        new Level(player, { x: 500, y: 400}, level3Walls, level3endPoint, level3Texts, canvas, ctx, monsterslvl3)
+        new Level(player, { x: 50, y: 360}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2),
+        new Level(player, { x: 550, y: 400}, level3Walls, level3endPoint, level3Texts, canvas, ctx, monsterslvl3),
+        new Level(player, { x: 850, y: 580}, level4Walls, level4endPoint, level4Texts, canvas, ctx, monsterslvl4)
     ]
 
     let currentLevel = 0;
@@ -340,7 +378,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Monster current level update
         levels[currentLevel].monsters.forEach(monster => {
-            monster.update();
+            monster.update(levels[currentLevel].endpointActive);
             if (monster.checkCollision(player)) {
                 gameEnd();
             }
