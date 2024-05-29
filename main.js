@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Player
-    const player = new Player(650, 380, 10, 10, 2, canvas, false);
+    const player = new Player(650, 380, 10, 10, 2, canvas, true);
     
     // Walls
     const level1Walls = [
@@ -371,6 +371,7 @@ document.addEventListener("DOMContentLoaded", function() {
         player.update(levels[currentLevel].walls);
         player.draw(ctx);
 
+
         if (levels[currentLevel]) {
             levels[currentLevel].update(deltaTime);
             levels[currentLevel].draw();
@@ -378,6 +379,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Monster current level update
         levels[currentLevel].monsters.forEach(monster => {
+            monster.draw(ctx);
             monster.update(levels[currentLevel].endpointActive);
             if (monster.checkCollision(player)) {
                 gameEnd();

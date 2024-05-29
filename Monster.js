@@ -59,4 +59,9 @@ export class Monster {
             this.y + this.height > other.y
         );
     }
+
+    draw(ctx) {
+        ctx.fillStyle = '#FFF'
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
 }
