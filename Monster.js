@@ -26,6 +26,7 @@ export class Monster {
     resetPosition() {
         this.x = this.originalX;
         this.y = this.originalY;
+        this.isMoving = false; // Stop moving when resetting position
     }
 
     moveTowardPlayer() {
