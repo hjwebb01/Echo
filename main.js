@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Player
-    const player = new Player(650, 380, 10, 10, 2, canvas, true);
+    const player = new Player(650, 380, 10, 10, 2, canvas, false);
     
     // Walls
     const level1Walls = [
@@ -102,26 +102,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Monsters
     const monsters = [
-        new Monster(650, 500, 50, 50, false, 0, player),
-        new Monster(1000, 200, 50, 50, false, 0, player),
-        new Monster(100, 300, 50, 50, false, 0, player),
-        new Monster(1300, 500, 50, 50, false, 0, player),
-        new Monster(100, 500, 50, 50, false, 0, player),
-        new Monster(100, 500, 50, 50, false, 0, player)
+        new Monster(650, 500, 50, 50, false, 0, player, false),
+        new Monster(1000, 200, 50, 50, false, 0, player, false),
+        new Monster(100, 300, 50, 50, false, 0, player, false),
+        new Monster(1300, 500, 50, 50, false, 0, player, false),
+        new Monster(100, 500, 50, 50, false, 0, player, false),
+        new Monster(100, 500, 50, 50, false, 0, player, false)
     ];
     
     const monsterslvl2 = [
     ];
 
     const monsterslvl3 = [
-        new Monster(1700, 50, 50, 50, true, 1, player),
-        new Monster(700, 380, 50, 50, false, 0, player),
-        new Monster(1100, 520, 50, 50, false, 0, player),
+        new Monster(1700, 50, 50, 50, true, 0.55, player, false),
+        new Monster(700, 380, 50, 50, false, 0, player, false),
+        new Monster(1100, 520, 50, 50, false, 0, player, false),
     ];
 
     const monsterslvl4 = [
-        new Monster(1700, 50, 50, 50, true, 1, player),
-        new Monster(20, 50, 50, 50, true, 1, player),
+        new Monster(1700, 50, 50, 50, true, 0.65, player, false),
+        new Monster(20, 50, 50, 50, true, 0.65, player, false),
     ];
 
     let startgameTexts = [

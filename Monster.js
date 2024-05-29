@@ -1,5 +1,5 @@
 export class Monster {
-    constructor(x, y, width, height, isMoving, moveSpeed, player) {
+    constructor(x, y, width, height, isMoving, moveSpeed, player, visibility) {
         this.originalX = x;
         this.originalY = y;
         this.x = x;
@@ -10,6 +10,7 @@ export class Monster {
         this.isMoving = false;  // Start as false, enable later
         this.moveSpeed = moveSpeed;
         this.player = player;
+        this.visibility = visibility;
     }
 
     update(endpointActive) {
@@ -62,7 +63,11 @@ export class Monster {
     }
 
     draw(ctx) {
-        ctx.fillStyle = '#FFF'
+        if (this.visibility) {
+            ctx.fillStyle = '#FFF'
+        } else {
+            ctx.fillStyle = '#000'
+        }
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 }

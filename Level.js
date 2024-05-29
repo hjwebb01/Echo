@@ -23,6 +23,7 @@ export class Level {
         this.currentTextIndex = 0;
         this.endpointActive = false;
         this.endpointFadeTime = 0;
+        this.endpointFadeInitiated = false;
         this.startupTexts.forEach(text => text.opacity = 0); // Reset opacity on activate
     }
 
