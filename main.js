@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ];
     
     const level4Walls = [
+        // Top half
         new Wall(0, 300, 178, 60, player, canvas, true, 100, 0.5),
         new Wall(178, 300, 178, 60, player, canvas, true, 100, 0.5),
         new Wall(356, 300, 178, 60, player, canvas, true, 100, 0.5),
@@ -87,7 +88,19 @@ document.addEventListener("DOMContentLoaded", function() {
         new Wall(1068, 300, 178, 60, player, canvas, true, 100, 0.5),
         new Wall(1246, 300, 178, 60, player, canvas, true, 100, 0.5),
         new Wall(1424, 300, 178, 60, player, canvas, true, 100, 0.5),
-        new Wall(1602, 300, 178, 60, player, canvas, true, 100, 0.5)
+        new Wall(1602, 300, 178, 60, player, canvas, true, 100, 0.5),
+
+        // Bottom half
+        new Wall(0, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(178, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(356, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(534, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(712, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(890, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1068, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1246, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1424, 360, 178, 60, player, canvas, true, 100, 0.5),
+        new Wall(1602, 360, 178, 60, player, canvas, true, 100, 0.5)
     ];
     
     
