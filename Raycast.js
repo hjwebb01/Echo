@@ -58,17 +58,18 @@ export class Raycast {
                     this.rays.push({ x: rayX, y: rayY, distance: distance, angle: angle, hitsEndPoint: collision.hitsEndPoint, hitsMonster: collision.hitsMonster });
                     if (this.pingActive || this.alwaysPing) {
                         let fraction = distance / this.maxDistance;
-                        let intensity = Math.pow(fraction, 0.1);
-                        let color = `rgba(255, 255, 255, ${1 - intensity})`;
+                        let intensity = Math.exp(-fraction * 5); // Increase the multiplier for a steeper decay
+                        let color = `rgba(255, 255, 255, ${intensity})`; // White for generic hits
                         if (collision.hitsEndPoint) {
-                            color = `rgba(0, 255, 0, ${1 - intensity})`; // Green for endPoint hits
+                            color = `rgba(0, 255, 0, ${intensity})`; // Green for endPoint hits
                         } else if (collision.hitsMonster) {
-                            color = `rgba(255, 0, 0, ${1 - intensity})`; // Red for monster hits
+                            color = `rgba(255, 0, 0, ${intensity})`; // Red for monster hits
                         }
                         let timeReduction = (1 - fraction) * this.fadeSpeed;
                         let timeVisible = 400 + timeReduction;
                         this.hitPoints.push({ x: rayX, y: rayY, time: Date.now(), color, timeVisible });
                     }
+                    
                     break;
                 }
 
@@ -137,15 +138,23 @@ export class Raycast {
     }
 
     drawRays(ctx) {
+        const playerCenterX = this.player.x + this.player.width / 2;
+        const playerCenterY = this.player.y + this.player.height / 2;
+
         if (this.visibility) {
-            ctx.strokeStyle = 'lightgreen';
-            ctx.beginPath();
-            ctx.lineWidth = 5;
             this.rays.forEach(ray => {
-                ctx.moveTo(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
+                // Create a gradient from the player's position to the end of the ray
+                let gradient = ctx.createLinearGradient(playerCenterX, playerCenterY, ray.x, ray.y);
+                gradient.addColorStop(0, 'rgba(0, 255, 0, 1)'); // Green color at the source
+                gradient.addColorStop(1, 'rgba(0, 255, 0, 0)'); // Transparent at the end
+
+                ctx.beginPath();
+                ctx.moveTo(playerCenterX, playerCenterY);
                 ctx.lineTo(ray.x, ray.y);
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 5; // Adjust line width if needed
+                ctx.stroke();
             });
-            ctx.stroke();
         }
 
         // Handle fading of the expanding circle
@@ -168,7 +177,7 @@ export class Raycast {
             }
 
             if (opacity > 0) {
-                ctx.strokeStyle = `rgba(144, 238, 144, ${opacity})`;  // Light green with calculated opacity
+                ctx.strokeStyle = `rgba(0, 255, 0, ${opacity})`;  // Light green with calculated opacity
                 ctx.lineWidth = 5;
                 ctx.beginPath();
                 ctx.arc(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, this.currentDistance, 0, Math.PI * 2);
