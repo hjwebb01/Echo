@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let currentLevel = 0;
 
     // Raycaster instances
-    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 18, 700, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, levels[currentLevel].monsters);
+    const raycastBell = new Raycast(canvas, player, levels[currentLevel].walls, 180, 24, 1000, 90, false, false, false, playBell, false, 1000, false, levels[currentLevel].endPoint, levels[currentLevel].monsters);
     const raycastRadar = new Raycast(canvas, player, levels[currentLevel].walls, 720, 30, 300, 100, true, true, true, false, false, 1000, true, levels[currentLevel].endPoint, levels[currentLevel].monsters);
     const raycastNone = { // instance of 'none selected'
         visibility: false,
