@@ -115,26 +115,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Monsters
     const monsters = [
-        new Monster(650, 500, 50, 50, false, 0, player, false),
-        new Monster(1000, 200, 50, 50, false, 0, player, false),
-        new Monster(100, 300, 50, 50, false, 0, player, false),
-        new Monster(1300, 500, 50, 50, false, 0, player, false),
-        new Monster(100, 500, 50, 50, false, 0, player, false),
-        new Monster(100, 500, 50, 50, false, 0, player, false)
+        new Monster(650, 500, 50, 50, false, 0, player, false, 0),
+        new Monster(1000, 200, 50, 50, false, 0, player, false, 0),
+        new Monster(100, 300, 50, 50, false, 0, player, false, 0),
+        new Monster(1300, 500, 50, 50, false, 0, player, false, 0),
+        new Monster(100, 500, 50, 50, false, 0, player, false, 0),
+        new Monster(100, 500, 50, 50, false, 0, player, false, 0)
     ];
     
     const monsterslvl2 = [
     ];
 
     const monsterslvl3 = [
-        new Monster(1700, 50, 50, 50, true, 0.55, player, false),
-        new Monster(700, 380, 50, 50, false, 0, player, false),
-        new Monster(1100, 520, 50, 50, false, 0, player, false),
+        new Monster(1700, 50, 50, 50, true, 0.55, player, false, 0.05),
+        new Monster(700, 380, 50, 50, false, 0, player, false, 0),
+        new Monster(1100, 520, 50, 50, false, 0, player, false, 0)
     ];
 
     const monsterslvl4 = [
-        new Monster(1700, 50, 50, 50, true, 0.65, player, false),
-        new Monster(20, 50, 50, 50, true, 0.65, player, false),
+        new Monster(1700, 50, 50, 50, true, 0.65, player, false, 0.1),
+        new Monster(20, 50, 50, 50, true, 0.65, player, false, 0.1)
     ];
 
     let startgameTexts = [
@@ -393,7 +393,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Monster current level update
         levels[currentLevel].monsters.forEach(monster => {
             monster.draw(ctx);
-            monster.update(levels[currentLevel].endpointActive);
+            monster.update(deltaTime, levels[currentLevel].endpointActive);
             if (monster.checkCollision(player)) {
                 gameEnd();
             }

@@ -22,6 +22,11 @@ export class Raycast {
         this.playSoundCallback = playSoundCallback;
         this.cross = cross;
         this.fadeSpeed = fadeSpeed;
+        this.audioFiles = [
+            new Audio('Distress_1.mp3'),
+            new Audio('Distress_2.mp3'),
+            new Audio('Distress_3.mp3')
+        ];
     }
 
     castRays() {
@@ -121,8 +126,12 @@ export class Raycast {
 
         // Check collision with monsters
         const hitsMonster = this.monsters.some(monster => {
-            return (rayX >= monster.x && rayX <= monster.x + monster.width &&
-                rayY >= monster.y && rayY <= monster.y + monster.height);
+            const hit = rayX >= monster.x && rayX <= monster.x + monster.width &&
+                    rayY >= monster.y && rayY <= monster.y + monster.height;
+            if (hit && monster.sighted()) {  // If the monster is hit and it's the first sighting
+                this.playRandomDistressSound();  // Play sound if the monster is sighted for the first time
+            }
+            return hit;
         });
 
         // Check if the ray hits the canvas boundaries
@@ -208,5 +217,11 @@ export class Raycast {
             ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
             ctx.fill();
         });
+    }
+
+    playRandomDistressSound() {
+        const soundIndex = Math.floor(Math.random() * this.audioFiles.length);
+        const audio = this.audioFiles[soundIndex];
+        audio.play();
     }
 }

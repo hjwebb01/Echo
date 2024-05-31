@@ -1,5 +1,5 @@
 export class Monster {
-    constructor(x, y, width, height, isMoving, moveSpeed, player, visibility) {
+    constructor(x, y, width, height, isMoving, moveSpeed, player, visibility, chanceTeleport) {
         this.originalX = x;
         this.originalY = y;
         this.x = x;
@@ -11,18 +11,27 @@ export class Monster {
         this.moveSpeed = moveSpeed;
         this.player = player;
         this.visibility = visibility;
+        this.isSighted = false;  // Play a sound for initial spotting
+        this.chanceTeleport = chanceTeleport;
+        this.teleportTimer = 0;
+        this.teleportInterval = 2000;
     }
 
-    update(endpointActive) {
-        // Only allow movement if textsShown is false
+    update(deltaTime, endpointActive) {
         if (this.isMovingInitially && endpointActive) {
             this.isMoving = true;
         }
 
         if (this.isMoving) {
+            this.teleportTimer += deltaTime;
+            if (this.teleportTimer >= this.teleportInterval) {
+                this.teleportTimer = 0;
+                this.checkAndTeleport();
+            }
             this.moveTowardPlayer();
         }
     }
+
 
     resetPosition() {
         this.x = this.originalX;
@@ -30,24 +39,44 @@ export class Monster {
         this.isMoving = false; // Stop moving when resetting position
     }
 
+    checkAndTeleport() {
+        const distance = this.calculateDistanceToPlayer();
+        if (distance < 300 && Math.random() < this.chanceTeleport) {
+            this.teleport();
+        }
+    }
+
+    teleport() {
+        let newX, newY, distance;
+        do {
+            newX = Math.random() * this.player.canvas.width;
+            newY = Math.random() * this.player.canvas.height;
+            const dx = this.player.x - newX;
+            const dy = this.player.y - newY;
+            distance = Math.sqrt(dx * dx + dy * dy);
+        } while (distance < 300 || distance > this.player.canvas.width); // Ensure teleportation is outside 300 units but within the canvas
+
+        this.x = newX;
+        this.y = newY;
+        this.isSighted = false;
+    }
+
     moveTowardPlayer() {
-        // Calculate the direction vector pointing from monster to player
         const dx = this.player.x - this.x;
         const dy = this.player.y - this.y;
-
-        // Calculate the distance to the player
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Normalize the direction vector
+        // Apply rubber banding: increase speed if distance is greater than 300 units
+        const speedMultiplier = distance > 300 ? 2 : 1;
+        const effectiveSpeed = this.moveSpeed * speedMultiplier;
+
         const normalizedX = dx / distance;
         const normalizedY = dy / distance;
 
-        // Move the monster towards the player
-        this.x += normalizedX * this.moveSpeed;
-        this.y += normalizedY * this.moveSpeed;
+        this.x += normalizedX * effectiveSpeed;
+        this.y += normalizedY * effectiveSpeed;
 
-        // Prevent overshooting the player's exact location by readjusting if close enough
-        if (Math.abs(this.x - this.player.x) < this.moveSpeed && Math.abs(this.y - this.player.y) < this.moveSpeed) {
+        if (Math.abs(this.x - this.player.x) < effectiveSpeed && Math.abs(this.y - this.player.y) < effectiveSpeed) {
             this.x = this.player.x;
             this.y = this.player.y;
         }
@@ -62,6 +91,12 @@ export class Monster {
         );
     }
 
+    calculateDistanceToPlayer() {
+        const dx = this.player.x - this.x;
+        const dy = this.player.y - this.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
     draw(ctx) {
         if (this.visibility) {
             ctx.fillStyle = '#FFF'
@@ -69,5 +104,13 @@ export class Monster {
             ctx.fillStyle = '#000'
         }
         ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    sighted() {
+        if (!this.isSighted && this.isMoving) { // Check if monster is moving and not already sighted
+            this.isSighted = true;
+            return true;
+        }
+        return false;
     }
 }
