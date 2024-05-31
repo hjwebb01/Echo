@@ -32,23 +32,21 @@ export class Monster {
     }
 
     moveTowardPlayer() {
-        // Calculate the direction vector pointing from monster to player
         const dx = this.player.x - this.x;
         const dy = this.player.y - this.y;
-
-        // Calculate the distance to the player
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Normalize the direction vector
+        // Apply rubber banding: increase speed if distance is greater than 300 units
+        const speedMultiplier = distance > 300 ? 2 : 1;
+        const effectiveSpeed = this.moveSpeed * speedMultiplier;
+
         const normalizedX = dx / distance;
         const normalizedY = dy / distance;
 
-        // Move the monster towards the player
-        this.x += normalizedX * this.moveSpeed;
-        this.y += normalizedY * this.moveSpeed;
+        this.x += normalizedX * effectiveSpeed;
+        this.y += normalizedY * effectiveSpeed;
 
-        // Prevent overshooting the player's exact location by readjusting if close enough
-        if (Math.abs(this.x - this.player.x) < this.moveSpeed && Math.abs(this.y - this.player.y) < this.moveSpeed) {
+        if (Math.abs(this.x - this.player.x) < effectiveSpeed && Math.abs(this.y - this.player.y) < effectiveSpeed) {
             this.x = this.player.x;
             this.y = this.player.y;
         }
