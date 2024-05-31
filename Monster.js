@@ -11,6 +11,7 @@ export class Monster {
         this.moveSpeed = moveSpeed;
         this.player = player;
         this.visibility = visibility;
+        this.isSighted = false;  // Play a sound for initial spotting
     }
 
     update(endpointActive) {
@@ -69,5 +70,13 @@ export class Monster {
             ctx.fillStyle = '#000'
         }
         ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    sighted() {
+        if (!this.isSighted && this.isMoving) { // Check if monster is moving and not already sighted
+            this.isSighted = true;
+            return true;
+        }
+        return false;
     }
 }
