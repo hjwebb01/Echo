@@ -152,19 +152,24 @@ export class Raycast {
 
         if (this.visibility) {
             this.rays.forEach(ray => {
+                // Calculate the fraction of the distance traveled by the ray relative to the maximum distance
+                let fraction = ray.distance / this.maxDistance;
+                let endOpacity = fraction; // Linear gradient fade out by distance
+
                 // Create a gradient from the player's position to the end of the ray
                 let gradient = ctx.createLinearGradient(playerCenterX, playerCenterY, ray.x, ray.y);
-                gradient.addColorStop(0, 'rgba(0, 255, 0, 1)'); // Green color at the source
-                gradient.addColorStop(1, 'rgba(0, 255, 0, 0)'); // Transparent at the end
+                gradient.addColorStop(0, 'rgba(0, 255, 0, 1)'); // Green color at the source, fully opaque
+                gradient.addColorStop(1, `rgba(0, 255, 0, ${1 - endOpacity})`); // Transparent green at the hit point or maximum distance
 
                 ctx.beginPath();
                 ctx.moveTo(playerCenterX, playerCenterY);
                 ctx.lineTo(ray.x, ray.y);
                 ctx.strokeStyle = gradient;
-                ctx.lineWidth = 5; // Adjust line width if needed
+                ctx.lineWidth = 5;
                 ctx.stroke();
             });
         }
+
 
         // Handle fading of the expanding circle
         let currentTime = Date.now();
