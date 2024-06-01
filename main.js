@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let raycastBellUsageCount = 0;
     const maxRaycastBellUsage = 3;
 
+    let isGameRunning = true; // Check to see if game should end/finish
+
     // Timer for random events
     let lastFrameTimeMs = 0; // Track the last frame time
 
@@ -344,9 +346,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function congratulatePlayer() {
-        // Display a congratulatory message
+        isGameRunning = false;  // Set the game state to not running
+    
+        const ctx = document.getElementById('gameCanvas').getContext('2d');
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);  // Clear the canvas
+    
         const congratsMessage = document.createElement('h1');
-        congratsMessage.textContent = 'Congratulations!';
+        congratsMessage.textContent = 'You win.. for now.';
         congratsMessage.style.color = '#fff';
         congratsMessage.style.position = 'absolute';
         congratsMessage.style.top = '50%';
@@ -354,6 +360,7 @@ document.addEventListener("DOMContentLoaded", function() {
         congratsMessage.style.transform = 'translate(-50%, -50%)';
         document.body.appendChild(congratsMessage);
     }
+    
 
     function gameEnd() {
         // Death logic
@@ -365,17 +372,11 @@ document.addEventListener("DOMContentLoaded", function() {
         resetButtons();
         updateRaycasters();
         currentType = 2;
-        /* const congratsMessage = document.createElement('h1');
-        congratsMessage.textContent = 'You touched a monster!';
-        congratsMessage.style.color = '#fff';
-        congratsMessage.style.position = 'absolute';
-        congratsMessage.style.top = '50%';
-        congratsMessage.style.left = '50%';
-        congratsMessage.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(congratsMessage); */
     }
 
     function gameLoop(timestamp) {
+        if (!isGameRunning) return; // Stop loop if game has finished
+
         const deltaTime = timestamp - lastFrameTimeMs; // Calculate delta time
         lastFrameTimeMs = timestamp; // Update last frame time
 
