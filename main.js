@@ -105,7 +105,59 @@ document.addEventListener("DOMContentLoaded", function() {
         new Wall(1602, 360, 178, 60, player, canvas, true, 100, 0.5)
     ];
     
+    const levelEdWalls = [
+        // Corners
+        new Wall(1190, 0, 590, 250, player, canvas, false, 0, 0),
+        new Wall(0, 470, 590, 250, player, canvas, false, 0, 0),
+        new Wall(0, 0, 590, 250, player, canvas, false, 0, 0),
+        new Wall(1190, 470, 590, 250, player, canvas, false, 0, 0),
+
+        // Middle
+        new Wall(690, 285, 400, 150, player, canvas, false, 0, 0),
+
+        // Closing Walls
+        new Wall(0, 0, 1780, 10, player, canvas, true, 120, 1),
+        new Wall(0, 700, 1780, 10, player, canvas, true, 120, 1),
+        new Wall(0, 0, 10, 720, player, canvas, true, 100, 1)
+    ];
     
+    const levelHuntWalls = [
+        new Wall(0, 700, 100, 20, player, canvas, true, 10, 1), //Bottom Half
+        new Wall(100, 680, 100, 60, player, canvas, true, 10, 1),
+        new Wall(200, 640, 100, 100, player, canvas, true, 10, 1),
+        new Wall(300, 620, 100, 100, player, canvas, true, 10, 1),
+        new Wall(400, 600, 100, 120, player, canvas, true, 10, 1),
+        new Wall(500, 550, 100, 140, player, canvas, true, 10, 1),
+        new Wall(600, 530, 100, 160, player, canvas, true, 5, 0.2),
+        new Wall(700, 510, 100, 180, player, canvas, true, 10, 1),
+        new Wall(800, 490, 100, 200, player, canvas, true, 10, 1),
+        new Wall(900, 470, 100, 225, player, canvas, true, 10, 1),
+        new Wall(1000, 450, 100, 250, player, canvas, true, 10, 1),
+        new Wall(1100, 430, 100, 275, player, canvas, true, 10, 1),
+        new Wall(1200, 410, 100, 300, player, canvas, true, 10, 1),
+        new Wall(1300, 350, 100, 325, player, canvas, true, 10, 1),
+        new Wall(1400, 325, 100, 100, player, canvas, true, 10, 1),
+        new Wall(1500, 300, 100, 100, player, canvas, true, 10, 1),
+        new Wall(1600, 275, 100, 100, player, canvas, true, 10, 1),
+
+        new Wall(0, 300, 100, 250, player, canvas, true, 10, 1), //Top Half
+        new Wall(100, 275, 100, 250, player, canvas, true, 10, 1),
+        new Wall(200, 250, 100, 250, player, canvas, true, 10, 1),
+        new Wall(300, 225, 100, 250, player, canvas, true, 10, 1),
+        new Wall(400, 200, 100, 250, player, canvas, true, 10, 1),
+        new Wall(500, 175, 100, 250, player, canvas, true, 10, 1),
+        new Wall(700, 125, 100, 250, player, canvas, true, 10, 1),
+        new Wall(800, 100, 100, 250, player, canvas, true, 10, 1),
+        new Wall(900, 75, 100, 250, player, canvas, true, 10, 1),
+        new Wall(1000, 50, 100, 250, player, canvas, true, 10, 1),
+        new Wall(1100, 25, 100, 250, player, canvas, true, 10, 1),
+        new Wall(1200, 0, 100, 250, player, canvas, true, 10, 1),
+        new Wall(1300, 0, 100, 225, player, canvas, true, 10, 1),
+        new Wall(1400, 0, 100, 200, player, canvas, true, 10, 1),
+        new Wall(1500, 0, 100, 175, player, canvas, true, 10, 1),
+        new Wall(1600, 0, 100, 150, player, canvas, true, 10, 1)
+    ];
+
 
     // Listen I know I know I should (probably) make a class for this stuff
     // but I will when I got more time alright leave me alone
@@ -114,6 +166,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const level2endPoint = { x: 1600, y: 600, width: 50, height: 50 };
     const level3endPoint = { x: 400, y: 650, width: 50, height: 50 };
     const level4endPoint = { x: 850, y: 100, width: 50, height: 50 };
+    const levelEdendPoint = { x: 1650, y: 360, width: 50, height: 50 };
+    const levelHuntendPoint = { x: 1720, y: 200, width: 50, height: 50 };
 
     // Monsters
     const monsters = [
@@ -139,6 +193,13 @@ document.addEventListener("DOMContentLoaded", function() {
         new Monster(20, 50, 50, 50, true, 0.65, player, false, 0.1)
     ];
 
+    const monsterslvlEd = [
+        new Monster(1700, 700, 50, 50, true, 0.8, player, false, 0.3),
+    ];
+
+    const monsterslvlHunt = [
+    ];
+
     let startgameTexts = [
         { text: "Navigate your vehicle with the arrow keys.", opacity: 0, y: canvas.height / 2 - 20 },
         { text: "Produce radars by clicking your controls at the top, you've been delegated 3 sonar blasts.", opacity: 0, y: canvas.height / 2 + 20 },
@@ -158,12 +219,23 @@ document.addEventListener("DOMContentLoaded", function() {
         { text: "THEY CAN GO THROUGH WALLS.", opacity: 0, y: canvas.height / 2 - 20 }
     ]
 
+    let levelEdTexts = [
+        { text: "The walls are closing in...", opacity: 0, y: canvas.height / 2 - 20 }
+    ]
+
+    let levelHuntTexts = [
+        { text: "Don't get squished.", opacity: 0, y: canvas.height / 2 - 20 }
+    ]
+
     // Level builders
     const levels = [
-        new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx, monsters),
+        new Level(player, { x: 100, y: 360}, levelEdWalls, levelEdendPoint, levelEdTexts, canvas, ctx, monsterslvlEd),
+        new Level(player, { x: 0, y: 640}, levelHuntWalls, levelEdendPoint, levelHuntTexts, canvas, ctx, monsterslvlHunt),
         new Level(player, { x: 50, y: 360}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2),
         new Level(player, { x: 550, y: 400}, level3Walls, level3endPoint, level3Texts, canvas, ctx, monsterslvl3),
-        new Level(player, { x: 850, y: 580}, level4Walls, level4endPoint, level4Texts, canvas, ctx, monsterslvl4)
+        new Level(player, { x: 850, y: 580}, level4Walls, level4endPoint, level4Texts, canvas, ctx, monsterslvl4),
+        new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx, monsters),
+
     ]
 
     let currentLevel = 0;
