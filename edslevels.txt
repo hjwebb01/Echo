@@ -1,0 +1,27 @@
+const levelEdWalls = [
+        // Corners
+        new Wall(1190, 0, 590, 250, player, canvas, false, 0, 0),
+        new Wall(0, 470, 590, 250, player, canvas, false, 0, 0),
+        new Wall(0, 0, 590, 250, player, canvas, false, 0, 0),
+        new Wall(1190, 470, 590, 250, player, canvas, false, 0, 0),
+
+        // Middle
+        new Wall(690, 285, 400, 150, player, canvas, false, 0, 0),
+
+        // Closing Walls
+        new Wall(0, 0, 1780, 10, player, canvas, true, 120, 1),
+        new Wall(0, 700, 1780, 10, player, canvas, true, 120, 1),
+        new Wall(0, 0, 10, 720, player, canvas, true, 100, 1)
+    ];
+
+const levelEdendPoint = { x: 1650, y: 360, width: 50, height: 50 };
+
+const monsterslvlEd = [
+        new Monster(1700, 700, 50, 50, true, 0.8, player, false, 0.3),
+    ];
+
+let levelEdTexts = [
+        { text: "The walls are closing in...", opacity: 0, y: canvas.height / 2 - 20 }
+    ]
+
+new Level(player, { x: 100, y: 360}, levelEdWalls, levelEdendPoint, levelEdTexts, canvas, ctx, monsterslvlEd)
