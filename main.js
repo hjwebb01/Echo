@@ -229,13 +229,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Level builders
     const levels = [
-        new Level(player, { x: 100, y: 360}, levelEdWalls, levelEdendPoint, levelEdTexts, canvas, ctx, monsterslvlEd),
-        new Level(player, { x: 0, y: 640}, levelHuntWalls, levelEdendPoint, levelHuntTexts, canvas, ctx, monsterslvlHunt),
-        new Level(player, { x: 50, y: 360}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2),
-        new Level(player, { x: 550, y: 400}, level3Walls, level3endPoint, level3Texts, canvas, ctx, monsterslvl3),
-        new Level(player, { x: 850, y: 580}, level4Walls, level4endPoint, level4Texts, canvas, ctx, monsterslvl4),
         new Level(player, { x: 360, y: 380}, level1Walls, endPoint, startgameTexts, canvas, ctx, monsters),
-
+        new Level(player, { x: 50, y: 360}, level2Walls, level2endPoint, level2Texts, canvas, ctx, monsterslvl2),
+        new Level(player, { x: 0, y: 640}, levelHuntWalls, levelEdendPoint, levelHuntTexts, canvas, ctx, monsterslvlHunt),
+        new Level(player, { x: 550, y: 400}, level3Walls, level3endPoint, level3Texts, canvas, ctx, monsterslvl3),
+        new Level(player, { x: 100, y: 360}, levelEdWalls, levelEdendPoint, levelEdTexts, canvas, ctx, monsterslvlEd),
+        new Level(player, { x: 850, y: 580}, level4Walls, level4endPoint, level4Texts, canvas, ctx, monsterslvl4),
     ]
 
     let currentLevel = 0;
